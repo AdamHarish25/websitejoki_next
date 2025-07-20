@@ -15,7 +15,7 @@ export default function Navbar() {
         </div>
         <div className="hidden md:flex items-center space-x-8">
           {navLinks.map((link) => (
-            <Link key={link} href={`${link == "Beranda" ? "/" : link }`} className="text-gray-600 hover:text-green-600 capitalize">
+            <Link key={link} href={`${link == "beranda" ? "/" : link }`} className="text-gray-600 hover:text-green-600 capitalize">
               {link}
             </Link>
           ))}
