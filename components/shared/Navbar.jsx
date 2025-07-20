@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { FaWhatsapp } from 'react-icons/fa';
 
 export default function Navbar() {
-  const navLinks = ["Beranda", "Blog"];
+  const navLinks = ["beranda", "blog"];
   const navLinksPage = ["layanan", "experience"];
 
   return (
