@@ -1,0 +1,26 @@
+import Navbar from '@/components/shared/Navbar';
+import Footer from '@/components/shared/Footer';
+
+export default function PublicLayout({ children }) {
+  return (
+    <>
+      <Navbar />
+      <main>
+        {children}
+      </main>
+      <Footer />
+    </>
+  );
+}
+
+// export default function PublicLayout({ children }) {
+//   return (
+//     <div>
+//       <header className="p-4 bg-blue-500 text-white">Ini Navbar</header>
+//       <main>
+//         {children}
+//       </main>
+//       <footer className="p-4 bg-gray-800 text-white">Ini Footer</footer>
+//     </div>
+//   );
+// }
