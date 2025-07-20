@@ -17,7 +17,7 @@ export default function CollaborationSection() {
     ]
 
     return (
-        <section id="kolaborasi" className="container grid grid-cols-1 md:grid-cols-2 place-items-center gap-8 p-6 mx-auto">
+        <section id="kolaborasi" className="container grid grid-cols-1 lg:grid-cols-2 place-items-center gap-8 p-6 mx-auto">
             <div className="relative w-full">
                 <Image
                     src="/Collaborate.png"
@@ -38,7 +38,7 @@ export default function CollaborationSection() {
 
                 <ul className="space-y-4">
                     {points.map((point, index) => (
-                        <li key={index} className="flex flex-col md:flex-row items-start space-y-6 md:space-x-6 bg-[#2ECC71]/15 p-6 rounded-lg shadow-md transition-transform hover:-translate-y-1">
+                        <li key={index} className="flex flex-col lg:flex-row items-start space-y-6 lg:space-x-6 bg-[#2ECC71]/15 p-6 rounded-lg shadow-md transition-transform hover:-translate-y-1">
                             <div className="h-10 w-20 bg-[#2ECC71] text-white flex items-center justify-center rounded-md">
                                 <Image src={point.icons} alt={point.title} width={30} height={30} />
                             </div>

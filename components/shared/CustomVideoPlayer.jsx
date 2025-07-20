@@ -4,14 +4,26 @@ import { useState, useRef, useEffect } from 'react';
 import { Play, Pause } from 'lucide-react';
 import Image from 'next/image'; // Impor komponen Image
 
+const AUTOPLAY_COUNTDOWN_SECONDS = 5;
+
 export default function CustomVideoPlayer({ src, thumbnailSrc }) {
   const videoRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
 
-  // ... (semua fungsi seperti togglePlayPause, handleScrub, dan useEffect tetap sama)
+  const [countdown, setCountdown] = useState(AUTOPLAY_COUNTDOWN_SECONDS);
+  const [showTimer, setShowTimer] = useState(true);
+
+  // Fungsi untuk memulai video (bisa dipanggil oleh timer atau klik)
+  const startVideo = () => {
+    videoRef.current.play();
+    setIsPlaying(true);
+    setShowTimer(false); // Sembunyikan timer saat video mulai
+  };
+
   const togglePlayPause = () => {
+    setShowTimer(false); // Sembunyikan timer jika user berinteraksi
     if (isPlaying) {
       videoRef.current.pause();
     } else {
@@ -19,6 +31,24 @@ export default function CustomVideoPlayer({ src, thumbnailSrc }) {
     }
     setIsPlaying(!isPlaying);
   };
+
+  useEffect(() => {
+    if (showTimer) {
+      const timer = setInterval(() => {
+        setCountdown((prevCountdown) => {
+          if (prevCountdown <= 1) {
+            clearInterval(timer);
+            startVideo(); // Mulai video saat countdown habis
+            return 0;
+          }
+          return prevCountdown - 1;
+        });
+      }, 1000);
+
+      // Cleanup function untuk membersihkan interval
+      return () => clearInterval(timer);
+    }
+  }, [showTimer]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -33,7 +63,7 @@ export default function CustomVideoPlayer({ src, thumbnailSrc }) {
       video.removeEventListener('ended', () => setIsPlaying(false));
     };
   }, []);
-  
+
   const handleScrub = (e) => {
     const scrubTime = (e.nativeEvent.offsetX / e.currentTarget.clientWidth) * duration;
     videoRef.current.currentTime = scrubTime;
@@ -48,6 +78,7 @@ export default function CustomVideoPlayer({ src, thumbnailSrc }) {
         className="w-full h-full object-cover"
         onClick={togglePlayPause}
         playsInline
+        muted
       />
 
       {/* ======================= PERUBAHAN DI SINI ======================= */}
@@ -70,14 +101,14 @@ export default function CustomVideoPlayer({ src, thumbnailSrc }) {
             {isPlaying ? <Pause size={24} /> : <Play size={24} />}
           </button>
           <div className="w-full h-1.5 bg-white/30 rounded-full cursor-pointer" onClick={handleScrub}>
-            <div className="h-full bg-[#2ECC71] rounded-full" style={{ width: `${progress}%` }}/>
+            <div className="h-full bg-[#2ECC71] rounded-full" style={{ width: `${progress}%` }} />
           </div>
         </div>
       </div>
 
       {/* Tombol Play Besar di Tengah (hanya muncul saat video dijeda) */}
       {!isPlaying && (
-        <div 
+        <div
           className="absolute inset-0 flex items-center justify-center bg-black/30 cursor-pointer z-20"
           onClick={togglePlayPause}
         >
