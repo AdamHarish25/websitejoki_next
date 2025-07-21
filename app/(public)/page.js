@@ -7,9 +7,10 @@ import HeroSection from '@/components/sections/HeroSection';
 import PortfolioSection from '@/components/sections/PortfolioSection';
 import ServicesSection from '@/components/sections/ServiceSection';
 import StatsSection from '@/components/sections/StatsSection';
+import FloatingWhatsApp from '@/components/shared/floatingWAButton';
 
 export default function HomePage() {
-  
+
   return (
     <>
       <HeroSection />
@@ -20,6 +21,7 @@ export default function HomePage() {
       <AnimatedSection><PortfolioSection /></AnimatedSection>
       <AnimatedSection><FaqSection /></AnimatedSection>
       <AnimatedSection><CtaSection /></AnimatedSection>
+      <FloatingWhatsApp />
     </>
   );
 }

@@ -1,5 +1,7 @@
 import CtaSection from '@/components/sections/CTASection';
 import FaqSection from '@/components/sections/FaqSection';
+import AnimatedSection from '@/components/shared/AnimatedSection';
+import FloatingWhatsApp from '@/components/shared/floatingWAButton';
 import { db } from '@/lib/firebaseConfig';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import Image from 'next/image';
@@ -73,6 +75,8 @@ export default async function ArticlePage({ params }) {
 
       <FaqSection/>
       <CtaSection />
+
+      <FloatingWhatsApp />
 
     </article>
   );

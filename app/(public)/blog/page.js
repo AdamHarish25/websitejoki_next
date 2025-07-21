@@ -2,13 +2,14 @@ import { db } from '@/lib/firebaseConfig';
 import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
 import Link from 'next/link';
 import Image from 'next/image';
+import FloatingWhatsApp from '@/components/shared/floatingWAButton';
 
 async function getArticles() {
   const articlesCollection = collection(db, 'articles');
   // Menambahkan filter untuk hanya mengambil artikel dengan published: true
   const q = query(articlesCollection, where("published", "==", true), orderBy('createdAt', 'desc'));
   const articleSnapshot = await getDocs(q);
-  
+
   const articleList = articleSnapshot.docs.map(doc => {
     const data = doc.data();
     return {
@@ -32,7 +33,7 @@ export default async function BlogPage() {
           <h1 className="text-4xl md:text-5xl font-extrabold mb-2">Blog & Artikel</h1>
           <p className="text-lg text-gray-600 dark:text-gray-300">Wawasan, tips, dan berita terbaru dari tim kami.</p>
         </div>
-        
+
         {articles.length === 0 ? (
           <p className="text-center text-gray-500">Belum ada artikel yang dipublikasikan.</p>
         ) : (
@@ -41,10 +42,10 @@ export default async function BlogPage() {
               <Link key={article.id} href={`/blog/${article.slug}`} className="block group">
                 <div className="hover:border-2 border-[#2ECC71] transition-transform duration-400 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 h-full flex flex-col">
                   <div className="relative w-full h-52">
-                    <img 
-                      src={article.coverImageUrl} 
-                      alt={`Gambar cover untuk artikel ${article.title}`} 
-                      className="object-cover w-full h-52" 
+                    <img
+                      src={article.coverImageUrl}
+                      alt={`Gambar cover untuk artikel ${article.title}`}
+                      className="object-cover w-full h-52"
                     />
                   </div>
                   <div className="p-6 flex flex-col flex-grow bg-white dark:bg-gray-800">
@@ -59,6 +60,9 @@ export default async function BlogPage() {
           </div>
         )}
       </div>
+
+      <FloatingWhatsApp />
+
     </div>
   );
 }

@@ -29,7 +29,7 @@ export default function FaqSection() {
   ];
 
   return (
-    <section className="py-20">
+    <section id='faq' className="py-20">
       <div className="container mx-auto px-6 max-w-3xl">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Frequently Asked Questions (FAQ)</h2>
         <div className="space-y-4">
