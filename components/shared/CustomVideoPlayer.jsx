@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Play, Pause } from 'lucide-react';
 import Image from 'next/image'; // Impor komponen Image
+import { FaVolumeMute, FaVolumeUp } from 'react-icons/fa';
 
 const AUTOPLAY_COUNTDOWN_SECONDS = 5;
 
@@ -14,12 +15,17 @@ export default function CustomVideoPlayer({ src, thumbnailSrc }) {
 
   const [countdown, setCountdown] = useState(AUTOPLAY_COUNTDOWN_SECONDS);
   const [showTimer, setShowTimer] = useState(true);
+  const [isMuted, setMuted] = useState(false)
 
   // Fungsi untuk memulai video (bisa dipanggil oleh timer atau klik)
   const startVideo = () => {
-    videoRef.current.play();
-    setIsPlaying(true);
-    setShowTimer(false); // Sembunyikan timer saat video mulai
+    if (videoRef.current) {
+      videoRef.current.muted = true; // 1. Pastikan video dibisukan
+      videoRef.current.play();       // 2. Baru putar videonya
+      setIsPlaying(true);
+      setShowTimer(false);
+      setMuted(true); // 3. Sinkronkan state React
+    }
   };
 
   const togglePlayPause = () => {
@@ -78,7 +84,7 @@ export default function CustomVideoPlayer({ src, thumbnailSrc }) {
         className="w-full h-full object-cover"
         onClick={togglePlayPause}
         playsInline
-        muted
+        muted={isMuted}
       />
 
       {/* ======================= PERUBAHAN DI SINI ======================= */}
@@ -103,6 +109,9 @@ export default function CustomVideoPlayer({ src, thumbnailSrc }) {
           <div className="w-full h-1.5 bg-white/30 rounded-full cursor-pointer" onClick={handleScrub}>
             <div className="h-full bg-[#2ECC71] rounded-full" style={{ width: `${progress}%` }} />
           </div>
+          <button onClick={() => setMuted(!isMuted)} className='hover:text-[#2ECC71] transition-colors'>
+            {isMuted ? <FaVolumeMute /> : <FaVolumeUp />}
+          </button>
         </div>
       </div>
 

@@ -17,8 +17,8 @@ export default function CollaborationSection() {
     ]
 
     return (
-        <section id="kolaborasi" className="container grid grid-cols-1 lg:grid-cols-2 place-items-center gap-8 p-6 mx-auto">
-            <div className="relative w-full">
+        <section id="kolaborasi" className="container grid grid-cols-1 lg:grid-cols-2 place-items-center gap-10 lg:gap-8 p-6 mx-auto">
+            <div className="relative lg:w-full">
                 <Image
                     src="/Collaborate.png"
                     alt="Kolaborasi"
@@ -28,7 +28,7 @@ export default function CollaborationSection() {
                 />
             </div>
 
-            <div className="space-y-4 grid place-content-end w-full p-0">
+            <div className="space-y-8 lg:space-y-4 grid place-content-end w-full p-0">
                 <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
                     Partner Kolaborasi Kreatif Anda
                 </h2>

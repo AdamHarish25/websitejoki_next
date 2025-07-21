@@ -42,7 +42,7 @@ export default function PortfolioSection() {
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {projects.map((project) => (
                         <Link key={project.title} href="#" className="block group">
                             <div className="relative overflow-hidden rounded-lg shadow-lg aspect-video bg-white">
@@ -67,7 +67,7 @@ export default function PortfolioSection() {
                                         />
                                     </div>
                                     {/* Judul Proyek */}
-                                    <h3 className="text-white text-2xl font-bold text-center transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                    <h3 className="text-white font-bold text-lg lg:text-2xl text-center transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
                                         {project.title}
                                     </h3>
                                 </div>

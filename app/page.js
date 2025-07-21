@@ -9,15 +9,19 @@ import ServicesSection from "@/components/sections/ServiceSection";
 import StatsSection from "@/components/sections/StatsSection";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
+import FloatingWhatsApp from "@/components/shared/floatingWAButton";
+import { trackEvent } from "@/lib/analytics";
 
 // Halaman beranda tidak perlu memanggil Navbar dan Footer
 // karena itu tugasnya layout
 export default function HomePage() {
+
+  
   
   return (
     <main>
       <Navbar />
-      <HeroSection />
+      <HeroSection  />
       <AnimatedSection>
         <StatsSection />
       </AnimatedSection>
@@ -35,6 +39,7 @@ export default function HomePage() {
       <AnimatedSection>
         <CtaSection />
       </AnimatedSection>
+      <FloatingWhatsApp/>
       <Footer/>
     </main>
   );
