@@ -96,6 +96,8 @@ export default function CreateArticlePage() {
                 author: user.email,
                 published: true,
             });
+            await fetch(`/api/revalidate?secret=${process.env.NEXT_PUBLIC_REVALIDATE_SECRET_TOKEN}`);
+            
             alert("Artikel berhasil dibuat!");
             router.push('/admin');
         } catch (error) {

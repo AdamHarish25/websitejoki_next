@@ -87,6 +87,8 @@ export default function EditArticlePage() {
                 content: content,
                 updatedAt: serverTimestamp()
             });
+            await fetch(`/api/revalidate?secret=${process.env.NEXT_PUBLIC_REVALIDATE_SECRET_TOKEN}`);
+
             alert("Artikel berhasil diupdate!");
             router.push('/admin');
         } catch (error) {

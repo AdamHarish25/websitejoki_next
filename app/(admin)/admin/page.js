@@ -15,6 +15,10 @@ export default function AdminDashboard() {
   const [articles, setArticles] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const triggerRevalidation = async () => {
+    await fetch(`/api/revalidate?secret=${process.env.NEXT_PUBLIC_REVALIDATE_SECRET_TOKEN}`);
+  };
+
   // Fungsi untuk mengambil semua artikel dari Firestore
   const fetchArticles = async () => {
     setIsLoading(true);
@@ -24,7 +28,7 @@ export default function AdminDashboard() {
       id: doc.id,
       ...doc.data(),
       // Format tanggal menjadi YYYY-MM-DD agar mudah disortir
-      createdAt: doc.data().createdAt?.toDate().toLocaleDateString('en-CA') 
+      createdAt: doc.data().createdAt?.toDate().toLocaleDateString('en-CA')
     }));
     setArticles(articlesData);
     setIsLoading(false);
@@ -49,7 +53,8 @@ export default function AdminDashboard() {
         published: !currentStatus
       });
       // Ambil ulang data untuk update tampilan secara real-time
-      fetchArticles(); 
+      fetchArticles();
+      await triggerRevalidation(); // <-- PANGGIL REVALIDASI DI SINI
     } catch (error) {
       console.error("Error updating status: ", error);
       alert("Gagal mengubah status.");
@@ -61,13 +66,14 @@ export default function AdminDashboard() {
       try {
         await deleteDoc(doc(db, 'articles', id));
         fetchArticles(); // Ambil ulang data
+        await triggerRevalidation(); // <-- PANGGIL REVALIDASI DI SINI
       } catch (error) {
         console.error("Error deleting document: ", error);
         alert("Gagal menghapus artikel.");
       }
     }
   };
-  
+
   // Menampilkan loading state jika data user atau artikel sedang diambil
   if (loading || isLoading) {
     return (
@@ -127,13 +133,13 @@ export default function AdminDashboard() {
                 </tr>
               )) : (
                 <tr>
-                    <td colSpan="4" className="text-center p-6 text-gray-400">No articles found. Create one!</td>
+                  <td colSpan="4" className="text-center p-6 text-gray-400">No articles found. Create one!</td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
-        
+
         {/* Tambahkan Tabel Services di sini dengan cara yang sama */}
 
       </div>
