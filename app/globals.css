@@ -31,11 +31,11 @@ em{
 }
 
 ul {
-  @apply list-disc pl-5;
+  @apply list-disc pl-10;
 }
 
 ol {
-  @apply list-decimal pl-5;
+  @apply list-decimal pl-10;
 }
 
 /* Style untuk tombol aktif di editor Tiptap */
@@ -50,35 +50,3 @@ ol {
 .switch{position:relative;display:inline-block;width:40px;height:24px}.switch input{opacity:0;width:0;height:0}.slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#ccc;transition:.4s}.slider:before{position:absolute;content:"";height:16px;width:16px;left:4px;bottom:4px;background-color:#fff;transition:.4s}input:checked+.slider{background-color:#2196F3}input:checked+.slider:before{transform:translateX(16px)}.slider.round{border-radius:34px}.slider.round:before{border-radius:50%}
 
 /* ... (kode tailwind dan style Anda yang lain) ... */
-
-@layer base {
-  /* Kustomisasi untuk area 'prose' */
-  .prose ul,
-  .prose ol {
-    @apply relative pl-8; /* Memberi ruang untuk garis dan bullet/number */
-  }
-
-  /* Membuat garis vertikal di kiri list */
-  .prose ul::before,
-  .prose ol::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    width: 2px;
-    background-color: #e5e7eb; /* Warna garis abu-abu muda */
-    border-radius: 2px;
-  }
-  
-  /* Ganti warna garis untuk mode gelap */
-  .dark .prose ul::before,
-  .dark .prose ol::before {
-    background-color: #374151; /* Warna garis abu-abu gelap */
-  }
-
-  /* Kustomisasi warna bullet/number agar kontras */
-  .prose li::marker {
-    @apply text-gray-500 dark:text-gray-400;
-  }
-}
