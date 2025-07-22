@@ -16,6 +16,7 @@ const MenuBar = ({ editor }) => {
         { name: 'H1', action: () => editor.chain().focus().toggleHeading({ level: 1 }).run(), active: 'heading', level: 1 },
         { name: 'H2', action: () => editor.chain().focus().toggleHeading({ level: 2 }).run(), active: 'heading', level: 2 },
         { name: 'H3', action: () => editor.chain().focus().toggleHeading({ level: 3 }).run(), active: 'heading', level: 3 },
+        { name: 'Blockquote', action: () => editor.chain().focus().toggleBlockquote().run(), active: 'blockquote' },
         { name: 'Bullet List', action: () => editor.chain().focus().toggleBulletList().run(), active: 'bulletList' },
         { name: 'Ordered List', action: () => editor.chain().focus().toggleOrderedList().run(), active: 'orderedList' },
     ];

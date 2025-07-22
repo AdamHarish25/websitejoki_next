@@ -17,7 +17,7 @@ const MenuBar = ({ editor }) => {
         { name: 'H1', action: () => editor.chain().focus().toggleHeading({ level: 1 }).run(), active: 'heading', level: 1 },
         { name: 'H2', action: () => editor.chain().focus().toggleHeading({ level: 2 }).run(), active: 'heading', level: 2 },
         { name: 'H3', action: () => editor.chain().focus().toggleHeading({ level: 3 }).run(), active: 'heading', level: 3 },
-
+        { name: 'Blockquote', action: () => editor.chain().focus().toggleBlockquote().run(), active: 'blockquote' },
         { name: 'Bullet List', action: () => editor.chain().focus().toggleBulletList().run(), active: 'bulletList' },
         { name: 'Ordered List', action: () => editor.chain().focus().toggleOrderedList().run(), active: 'orderedList' },
     ];
@@ -97,7 +97,7 @@ export default function CreateArticlePage() {
                 published: true,
             });
             await fetch(`/api/revalidate?secret=${process.env.NEXT_PUBLIC_REVALIDATE_SECRET_TOKEN}`);
-            
+
             alert("Artikel berhasil dibuat!");
             router.push('/admin');
         } catch (error) {
@@ -126,7 +126,7 @@ export default function CreateArticlePage() {
                             <input type="text" value={slug} onChange={handleSlugChange} required className="w-full p-2 border border-white rounded-md bg-[#2ECC71]/50 text-black focus:ring-yellow-400 focus:border-yellow-400" />
                             <p className="text-sm text-gray-400 mt-1">URL akan menjadi: `.../blog/{slug}`</p>
                         </div>
-                        
+
                         <div>
                             <label className="block text-lg font-medium mb-1">Meta Description (untuk SEO, max 160 karakter)</label>
                             <textarea
