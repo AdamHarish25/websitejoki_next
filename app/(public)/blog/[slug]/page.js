@@ -30,6 +30,26 @@ async function getArticle(slug) {
   };
 }
 
+export async function generateMetadata({ params }) {
+  const article = await getArticle(params.slug);
+
+  if (!article) {
+    return { title: "Artikel Tidak Ditemukan" };
+  }
+  
+  return {
+    title: `${article.title} | WebsiteJoki.ID`,
+    // Gunakan metaDescription dari database, atau potong konten jika kosong
+    description: article.metaDescription || article.content.replace(/<[^>]+>/g, '').substring(0, 155) + '...',
+    openGraph: {
+        title: article.title,
+        description: article.metaDescription || article.content.replace(/<[^>]+>/g, '').substring(0, 155) + '...',
+        images: [{ url: article.coverImageUrl }],
+    },
+  };
+}
+
+
 export async function generateStaticParams() {
   const articlesCol = collection(db, 'articles');
   // Menambahkan filter untuk hanya membuat halaman statis bagi artikel yang dipublish
@@ -55,13 +75,14 @@ export default async function ArticlePage({ params }) {
           <p className="text-gray-500 dark:text-gray-400">Oleh {article.author} • Dipublikasikan pada {article.createdAt}</p>
         </header>
 
-        <div className="relative w-full aspect-video rounded-lg overflow-hidden mb-12 shadow-lg">
+        <div className="relative w-full aspect-video rounded-lg overflow-hidden mb-5 shadow-lg">
           <img
             src={article.coverImageUrl}
             alt={`Gambar cover untuk artikel ${article.title}`}
-            className="object-cover "
+            className="object-cover object-center w-full h-full"
           />
         </div>
+         <p className='text-gray-400 pb-10'>Source: Pexels.com</p>
 
         <div
           className="prose lg:prose-xl dark:prose-invert max-w-none prose-headings:mb-3 prose-headings:mt-8 // Atur jarak atas/bawah untuk judul

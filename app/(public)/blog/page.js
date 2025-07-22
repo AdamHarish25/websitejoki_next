@@ -27,8 +27,8 @@ export default async function BlogPage() {
   const articles = await getArticles();
 
   return (
-    <div className="bg-white dark:bg-gray-900 h-auto lg:h-screen">
-      <div className="container mx-auto px-6 py-16">
+    <div className="bg-white dark:bg-gray-900 h-auto">
+      <div className="container mx-auto px-6 py-20">
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-extrabold mb-2">Blog & Artikel</h1>
           <p className="text-lg text-gray-600 dark:text-gray-300">Wawasan, tips, dan berita terbaru dari tim kami.</p>
@@ -48,8 +48,11 @@ export default async function BlogPage() {
                       className="object-cover w-full h-52"
                     />
                   </div>
-                  <div className="p-6 flex flex-col flex-grow bg-white dark:bg-gray-800">
-                    <h2 className="text-lg lg:text-xl font-bold mb-3 group-hover:text-green-600 transition-colors">{article.title}</h2>
+                  <div className="p-6 flex flex-col flex-grow bg-white dark:bg-gray-800 space-y-6">
+                    <h2 className="text-lg lg:text-xl font-bold  group-hover:text-green-600 transition-colors">{article.title}</h2>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">
+                      {article.metaDescription}
+                    </p>
                     <p className="text-gray-500 dark:text-gray-400 text-sm mt-auto pt-4">
                       Dipublikasikan pada {article.createdAt}
                     </p>

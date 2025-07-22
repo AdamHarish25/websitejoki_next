@@ -38,10 +38,11 @@ export default function CreateArticlePage() {
 
     const [title, setTitle] = useState('');
     const [slug, setSlug] = useState('');
+    const [metaDescription, setMetaDescription] = useState(''); // <-- STATE BARU
     const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
     const [coverImage, setCoverImage] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
-    
+
     const editor = useEditor({
         extensions: [StarterKit],
         content: '<p>Tulis artikel Anda di sini...</p>',
@@ -68,8 +69,8 @@ export default function CreateArticlePage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const content = editor.getHTML();
-        if (!title || !slug || content === '<p></p>' || !coverImage) {
-            alert("Judul, Slug, konten, dan gambar cover wajib diisi!");
+        if (!title || !slug || !metaDescription || content === '<p></p>' || !coverImage) {
+            alert("Semua field wajib diisi, termasuk Meta Description!");
             return;
         }
         setIsLoading(true);
@@ -88,6 +89,7 @@ export default function CreateArticlePage() {
             await addDoc(collection(db, "articles"), {
                 title,
                 slug,
+                metaDescription, // <-- SIMPAN META DESCRIPTION
                 content,
                 coverImageUrl: imageUrl,
                 createdAt: serverTimestamp(),
@@ -103,10 +105,10 @@ export default function CreateArticlePage() {
             setIsLoading(false);
         }
     };
-    
-    if(loading) return <div className="bg-gray-800 text-white min-h-screen flex items-center justify-center">Loading...</div>;
 
-    if(user) {
+    if (loading) return <div className="bg-gray-800 text-white min-h-screen flex items-center justify-center">Loading...</div>;
+
+    if (user) {
         return (
             <div className="bg-white text-black min-h-screen p-8">
                 <div className="max-w-4xl mx-auto">
@@ -115,16 +117,30 @@ export default function CreateArticlePage() {
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div>
                             <label className="block text-lg font-medium mb-1">Judul Artikel</label>
-                            <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required className="w-full p-2 border border-white rounded-md bg-[#2ECC71]/50 text-black focus:ring-yellow-400 focus:border-yellow-400"/>
+                            <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required className="w-full p-2 border border-white rounded-md bg-[#2ECC71]/50 text-black focus:ring-yellow-400 focus:border-yellow-400" />
                         </div>
                         <div>
                             <label className="block text-lg font-medium mb-1">Slug (URL)</label>
-                            <input type="text" value={slug} onChange={handleSlugChange} required className="w-full p-2 border border-white rounded-md bg-[#2ECC71]/50 text-black focus:ring-yellow-400 focus:border-yellow-400"/>
+                            <input type="text" value={slug} onChange={handleSlugChange} required className="w-full p-2 border border-white rounded-md bg-[#2ECC71]/50 text-black focus:ring-yellow-400 focus:border-yellow-400" />
                             <p className="text-sm text-gray-400 mt-1">URL akan menjadi: `.../blog/{slug}`</p>
                         </div>
+                        
+                        <div>
+                            <label className="block text-lg font-medium mb-1">Meta Description (untuk SEO, max 160 karakter)</label>
+                            <textarea
+                                value={metaDescription}
+                                onChange={(e) => setMetaDescription(e.target.value)}
+                                rows={3}
+                                maxLength={160}
+                                required
+                                className="w-full p-2 border border-gray-300 rounded-md bg-[#2ECC71]/50 text-black focus:ring-yellow-400 focus:border-yellow-400"
+                            />
+                            <p className="text-sm text-right">{metaDescription.length} / 160</p>
+                        </div>
+
                         <div>
                             <label className="block text-lg font-medium mb-1">Gambar Cover</label>
-                            <input type="file" onChange={(e) => setCoverImage(e.target.files[0])} required className="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#2ECC71] file:text-white hover:file:bg-green-700"/>
+                            <input type="file" onChange={(e) => setCoverImage(e.target.files[0])} required className="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#2ECC71] file:text-white hover:file:bg-green-700" />
                         </div>
                         <div>
                             <label className="block text-lg font-medium mb-2">Konten</label>
