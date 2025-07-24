@@ -37,9 +37,9 @@ export default function HomePage() {
       <AnimatedSection>
         <FaqSection />
       </AnimatedSection>
-      <AnimatedSection>
+      {/* <AnimatedSection>
         <PricingSection category="seo" />
-      </AnimatedSection>
+      </AnimatedSection> */}
       <AnimatedSection>
         <CtaSection />
       </AnimatedSection>
