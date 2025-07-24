@@ -136,7 +136,7 @@ export default async function ServiceDetailPage({ params }) {
 
       {/* Bagian 4 & 5: Tampilkan seksi lain untuk melengkapi halaman */}
       <FaqSection />
-      <CtaSection />
+      {/* <CtaSection /> */}
     </>
   );
 }

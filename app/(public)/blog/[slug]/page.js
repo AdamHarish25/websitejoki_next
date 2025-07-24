@@ -124,7 +124,7 @@ export default async function ArticlePage({ params }) {
 
 
       <FaqSection />
-      <CtaSection />
+      {/* <CtaSection /> */}
 
       <FloatingWhatsApp />
 
