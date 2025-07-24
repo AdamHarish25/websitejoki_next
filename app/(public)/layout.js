@@ -5,7 +5,7 @@ export default function PublicLayout({ children }) {
   return (
     <>
       <Navbar />
-      <main>
+      <main className='min-h-screen'>
         {children}
       </main>
       <Footer />

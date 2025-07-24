@@ -11,6 +11,7 @@ import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
 import FloatingWhatsApp from "@/components/shared/floatingWAButton";
 import { trackEvent } from "@/lib/analytics";
+import PricingSection from "@/components/sections/PricingSections";
 
 // Halaman beranda tidak perlu memanggil Navbar dan Footer
 // karena itu tugasnya layout
@@ -19,7 +20,7 @@ export default function HomePage() {
   
   
   return (
-    <main>
+    <main className="min-h-screen">
       <Navbar />
       <HeroSection  />
       <AnimatedSection>
@@ -35,6 +36,9 @@ export default function HomePage() {
       </AnimatedSection>
       <AnimatedSection>
         <FaqSection />
+      </AnimatedSection>
+      <AnimatedSection>
+        <PricingSection category="seo" />
       </AnimatedSection>
       <AnimatedSection>
         <CtaSection />

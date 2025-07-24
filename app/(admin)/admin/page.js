@@ -13,6 +13,9 @@ export default function AdminDashboard() {
   const router = useRouter();
 
   const [articles, setArticles] = useState([]);
+
+  // State BARU untuk Layanan
+  const [services, setServices] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const triggerRevalidation = async () => {
@@ -31,6 +34,12 @@ export default function AdminDashboard() {
       createdAt: doc.data().createdAt?.toDate().toLocaleDateString('en-CA')
     }));
     setArticles(articlesData);
+
+    // Fetch Services
+    const servicesQuery = query(collection(db, 'services'), orderBy('createdAt', 'desc'));
+    const servicesSnapshot = await getDocs(servicesQuery);
+    setServices(servicesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), createdAt: doc.data().createdAt?.toDate().toLocaleDateString('en-CA') })));
+
     setIsLoading(false);
   };
 
@@ -74,6 +83,14 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleServiceDelete = async (id) => {
+    if (window.confirm("Yakin ingin menghapus layanan ini?")) {
+      await deleteDoc(doc(db, 'services', id));
+      await fetchAllData();
+      await triggerRevalidation('/layanan');
+    }
+  };
+
   // Menampilkan loading state jika data user atau artikel sedang diambil
   if (loading || isLoading) {
     return (
@@ -99,6 +116,12 @@ export default function AdminDashboard() {
           <p className="mb-4">This is your admin dashboard where you can manage articles.</p>
           <Link href="/admin/create-article" className="bg-blue-600 text-white px-5 py-3 rounded-md hover:bg-blue-700 transition-colors mr-4">
             + Create New Article
+          </Link>
+          <Link href="/admin/create-service" className="bg-teal-600 text-white px-5 py-3 rounded-md hover:bg-teal-700 transition-colors">
+            + Create New Service
+          </Link>
+          <Link href="/admin/manage-packages" className="bg-yellow-600 text-white px-5 py-3 rounded-md hover:bg-yellow-700 transition-colors ml-4">
+            + Manage Pricing Packages
           </Link>
           {/* <Link href="/admin/create-service" className="bg-teal-600 text-white px-5 py-3 rounded-md hover:bg-teal-700 transition-colors">+ Create New Service</Link> */}
         </div>
@@ -140,6 +163,31 @@ export default function AdminDashboard() {
           </table>
         </div>
 
+
+        <div className="bg-[#2ECC71]/15 p-6 rounded-lg my-10">
+          <h2 className="text-2xl font-semibold mb-4">Manage Services</h2>
+          <table className="w-full text-left min-w-[600px]">
+            <thead>
+              <tr className="border-b border-gray-600">
+                <th className="p-3">SERVICE TITLE</th>
+                <th className="p-3">DATE CREATED</th>
+                <th className="p-3 text-right">ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody>
+              {services.map(service => (
+                <tr key={service.id} className="border-b border-gray-600 hover:bg-gray-700">
+                  <td className="p-3">{service.title}</td>
+                  <td className="p-3">{service.createdAt}</td>
+                  <td className="p-3 text-right">
+                    <Link href={`/admin/edit-service/${service.id}`} className="text-yellow-400 hover:underline mr-4">Edit</Link>
+                    <button onClick={() => handleServiceDelete(service.id)} className="text-red-500 hover:underline">Delete</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         {/* Tambahkan Tabel Services di sini dengan cara yang sama */}
 
       </div>

@@ -54,6 +54,18 @@ ol {
     scroll-margin-top: 120px;
     /* Sesuaikan angka ini dengan tinggi navbar Anda */
   }
+
+  .prose table {
+    @apply w-full border-collapse; /* Membuat tabel lebar penuh & border menyatu */
+  }
+  .prose th,
+  .prose td {
+    @apply border border-black px-4 py-2; /* Memberi border & padding pada setiap sel */
+  }
+  .dark .prose th,
+  .dark .prose td {
+    @apply border-gray-600; /* Warna border untuk mode gelap */
+  }
 }
 
 .switch {
