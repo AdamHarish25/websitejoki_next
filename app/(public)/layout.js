@@ -1,5 +1,6 @@
 import Navbar from '@/components/shared/Navbar';
 import Footer from '@/components/shared/Footer';
+import CtaSection from '@/components/sections/CTASection';
 
 export default function PublicLayout({ children }) {
   return (
@@ -8,6 +9,7 @@ export default function PublicLayout({ children }) {
       <main className='min-h-screen'>
         {children}
       </main>
+      <CtaSection />
       <Footer />
     </>
   );
