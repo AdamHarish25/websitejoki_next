@@ -50,7 +50,7 @@ export default async function ServicesPage() {
     };
   });
   return (
-    <div className='w-full h-full rounded-xl'>
+    <div className='w-full h-fit rounded-xl'>
 
 
       <div className="container h-full mx-auto px-6 py-16 rounded-xl">
@@ -58,7 +58,7 @@ export default async function ServicesPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 h-full gap-8">
           {services.map((service) => (
             <Link key={service.id} href={`/layanan/${service.slug}`} className="block group">
-              <div className="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 h-full flex flex-col">
+              <div className="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 h-fit flex flex-col">
                 {/* Bagian Gambar/Banner */}
                 <div className="relative w-full h-fit bg-[#2ECC71]/10 dark:bg-gray-800 flex items-center justify-center p-3">
                   <img

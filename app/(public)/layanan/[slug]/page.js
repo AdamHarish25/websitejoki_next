@@ -13,29 +13,56 @@ import FloatingWhatsApp from '@/components/shared/floatingWAButton';
 
 // --- FUNGSI PENGAMBILAN DATA ---
 // Fungsi ini berjalan di server untuk mengambil data satu layanan berdasarkan slug-nya
+// Komponen Display untuk Blok (bisa diletakkan di file terpisah jika mau)
+function RichTextBlockDisplay({ content }) {
+  return (
+    <section className="container mx-auto py-12 px-6">
+      <div
+        className="prose lg:prose-xl max-w-none dark:prose-invert"
+        dangerouslySetInnerHTML={{ __html: content }}
+      />
+    </section>
+  );
+}
+
+function ImageTextSplitBlockDisplay({ imageUrl, text, imagePosition }) {
+  const imageOrderClass = imagePosition === 'right' ? 'md:order-last' : '';
+  return (
+    <section className="container mx-auto py-12 px-6">
+      <div className="grid md:grid-cols-2 gap-8 md:gap-14 items-center">
+        <div className={`relative w-full aspect-square rounded-lg overflow-hidden shadow-lg ${imageOrderClass}`}>
+          {/* 3. 'fill' akan mengisi parent, 'object-cover' menjaga rasio */}
+          <Image
+            src={imageUrl}
+            alt="Gambar pendukung untuk layanan"
+            fill
+            className="object-cover"
+            // 4. 'sizes' membantu Next.js mengoptimalkan gambar
+            sizes="(max-width: 768px) 100vw, 50vw"
+          />
+        </div>
+        <div
+          className="prose lg:prose-xl dark:prose-invert max-w-none"
+          dangerouslySetInnerHTML={{ __html: text }}
+        />
+      </div>
+    </section>
+  );
+}
+
+
 async function getService(slug) {
   const q = query(collection(db, "services"), where("slug", "==", slug));
   const querySnapshot = await getDocs(q);
 
-  // Jika artikel dengan slug tersebut tidak ada, tampilkan halaman 404
   if (querySnapshot.empty) {
     notFound();
   }
-
   const serviceData = querySnapshot.docs[0].data();
-
-  // Validasi tambahan: jika layanan ada tapi tidak dipublish, anggap tidak ditemukan
   if (serviceData.published !== true) {
     notFound();
   }
-
-  // Format tanggal agar mudah dibaca (opsional, jika Anda punya field tanggal)
-  return {
-    ...serviceData,
-    createdAt: serviceData.createdAt?.toDate().toLocaleDateString('id-ID', {
-      day: 'numeric', month: 'long', year: 'numeric'
-    }),
-  };
+  return { ...serviceData, createdAt: serviceData.createdAt?.toDate().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) };
 }
 
 // --- FUNGSI UNTUK SEO & METADATA ---
@@ -83,60 +110,50 @@ export const revalidate = 60;
 
 // --- KOMPONEN UTAMA HALAMAN ---
 export default async function ServiceDetailPage({ params }) {
-  // 1. Ambil data layanan utama dari Firestore berdasarkan slug di URL
   const service = await getService(params.slug);
 
   return (
     <>
-      {/* Bagian 1: Hero Banner untuk halaman layanan */}
       <section className="relative h-[50vh] flex items-center justify-center text-center text-white">
-        {/* Gambar sebagai background */}
         {service.heroImageUrl && (
-          <img
-            src={service.heroImageUrl}
-            alt={`Gambar utama untuk ${service.title}`}
-            className="object-cover w-full h-full absolute inset-0 opacity-50"
-          />
+          <img src={service.heroImageUrl} alt={`Gambar utama untuk ${service.title}`} className="object-cover w-full h-full absolute top-0 right-0" />
         )}
-        {/* Overlay gelap agar teks terbaca */}
         <div className="absolute inset-0 bg-black/50" />
-
-        {/* Konten Teks di atas overlay */}
-        <div className="relative z-10 container mx-auto px-6 text-start md:text-center">
-          <h1 className="text-2xl md:text-6xl font-extrabold">{service.title}</h1>
-          <p className=" md:text-xl mt-4 max-w-3xl mx-auto">{service.shortDescription}</p>
+        <div className="relative z-10 container mx-auto px-6">
+          <h1 className="text-4xl md:text-6xl font-extrabold">{service.title}</h1>
+          <p className="md:text-xl mt-4 max-w-3xl mx-auto">{service.shortDescription}</p>
         </div>
       </section>
 
-      {/* Bagian 3: Tampilkan Paket Harga yang relevan jika kategorinya ada */}
-      {service.pricingCategory && (
-        <PricingSection category={service.pricingCategory} />
-      )}
+      {service.pageContent && service.pageContent.map((block, index) => {
+        switch (block.type) {
+          case 'richText':
+            return <RichTextBlockDisplay key={index} content={block.content} />;
+          case 'imageLeftTextRight':
+            return <ImageTextSplitBlockDisplay key={index} imageUrl={block.content.imageUrl} text={block.content.text} imagePosition={block.content.imagePosition} />;
+          default:
+            return null;
+        }
+      })}
 
-      {/* Bagian 2: Tampilkan Grid Fitur jika datanya ada */}
       {service.featuresList && service.featuresList.length > 0 && (
-        <FeaturesGrid features={service.featuresList} title={`Apa Saja yang Termasuk Dalam Layanan ${service.title}?`} />
+        <FeaturesGrid features={service.featuresList} title={`Apa Saja yang Termasuk Dalam ${service.pricingCategory == "web" ? "Layanan Website" : service.title}?`} />
       )}
-
-       {/* 2. Cek apakah kategori layanan adalah "seo" */}
       {service.pricingCategory === 'seo' && (
         <div>
-          <div className="container mx-auto px-6 pt-16 text-start md:text-center">
-              <h2 className="text-4xl font-extrabold mb-4">Hitung Potensi ROI SEO Anda</h2>
-              <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-                  Gunakan kalkulator interaktif kami untuk mendapatkan estimasi potensi keuntungan dari investasi SEO Anda.
-              </p>
+          <div className="container mx-auto px-6 pt-16 text-center">
+            <h2 className="text-4xl font-extrabold mb-4">Hitung Potensi ROI SEO Anda</h2>
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">Gunakan kalkulator interaktif kami untuk mendapatkan estimasi potensi keuntungan dari investasi SEO Anda.</p>
           </div>
           <SeoCalculator />
         </div>
       )}
+      {service.pricingCategory && (
+        <PricingSection category={service.pricingCategory} />
+      )}
 
-      
-      <FloatingWhatsApp/>
-
-      {/* Bagian 4 & 5: Tampilkan seksi lain untuk melengkapi halaman */}
+      <FloatingWhatsApp />
       <FaqSection />
-      {/* <CtaSection /> */}
     </>
   );
 }

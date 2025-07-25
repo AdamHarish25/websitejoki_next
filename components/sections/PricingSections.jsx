@@ -52,7 +52,7 @@ export default function PricingSection({category}) {
                             <p className="text-green-600 dark:text-green-400 font-semibold text-center mt-1">{pkg.subtitle}</p>
                             
                             <div className="my-6 text-center">
-                                <span className="text-5xl font-extrabold">{pkg.price}</span>
+                                <span className="text-5xl font-extrabold">Rp.{pkg.price}</span>
                                 <span className="text-gray-500 dark:text-gray-400">{pkg.pricePeriod}</span>
                             </div>
 

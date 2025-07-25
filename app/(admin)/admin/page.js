@@ -83,6 +83,7 @@ export default function AdminDashboard() {
     }
   };
 
+   // Fungsi untuk menghapus layanan
   const handleServiceDelete = async (id) => {
     if (window.confirm("Yakin ingin menghapus layanan ini?")) {
       await deleteDoc(doc(db, 'services', id));
@@ -175,16 +176,20 @@ export default function AdminDashboard() {
               </tr>
             </thead>
             <tbody>
-              {services.map(service => (
-                <tr key={service.id} className="border-b border-gray-600 hover:bg-gray-700">
+              {services.length > 0 ? services.map(service => (
+                <tr key={service.id} className="border-b hover:bg-gray-200">
                   <td className="p-3">{service.title}</td>
                   <td className="p-3">{service.createdAt}</td>
                   <td className="p-3 text-right">
-                    <Link href={`/admin/edit-service/${service.id}`} className="text-yellow-400 hover:underline mr-4">Edit</Link>
-                    <button onClick={() => handleServiceDelete(service.id)} className="text-red-500 hover:underline">Delete</button>
+                    <Link href={`/admin/edit-service/${service.id}`} className="text-yellow-600 hover:underline mr-4 font-semibold">Edit</Link>
+                    <button onClick={() => handleServiceDelete(service.id)} className="text-red-600 hover:underline font-semibold">Delete</button>
                   </td>
                 </tr>
-              ))}
+              )) : (
+                <tr>
+                    <td colSpan="3" className="text-center p-6 text-gray-500">Belum ada layanan. Silakan buat yang baru.</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

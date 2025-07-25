@@ -1,36 +1,60 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebaseConfig';
 
 // Impor komponen Blok
 import TextBlock from '@/components/admin/TextBlock';
 import ImageTextBlock from '@/components/admin/ImageTextBlock';
 
-export default function CreateServicePage() {
+export default function EditServicePage() {
     const [user, loading] = useAuthState(auth);
     const router = useRouter();
+    const { id } = useParams(); // Mengambil ID dari URL
 
-    // State untuk data terstruktur
+    // State untuk semua data layanan
     const [title, setTitle] = useState('');
     const [slug, setSlug] = useState('');
     const [shortDescription, setShortDescription] = useState('');
     const [pricingCategory, setPricingCategory] = useState('seo');
-    const [heroImage, setHeroImage] = useState(null);
+    const [heroImage, setHeroImage] = useState(null); // Untuk file gambar baru
+    const [existingHeroImageUrl, setExistingHeroImageUrl] = useState(''); // Untuk URL gambar lama
     const [features, setFeatures] = useState(['']);
     const [pageContent, setPageContent] = useState([]);
+    
     const [isLoading, setIsLoading] = useState(false);
+    const [isFetchingData, setIsFetchingData] = useState(true);
 
-    // Fungsi slug otomatis
+    // Ambil data layanan yang ada saat halaman dimuat
     useEffect(() => {
-        const autoSlug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '').replace(/--+/g, '-').replace(/^-+|-+$/g, '');
-        setSlug(autoSlug);
-    }, [title]);
-
+        if (id) {
+            const fetchService = async () => {
+                setIsFetchingData(true);
+                const docRef = doc(db, 'services', id);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    setTitle(data.title);
+                    setSlug(data.slug);
+                    setShortDescription(data.shortDescription);
+                    setPricingCategory(data.pricingCategory);
+                    setExistingHeroImageUrl(data.heroImageUrl);
+                    setFeatures(data.featuresList || ['']);
+                    setPageContent(data.pageContent || []);
+                } else {
+                    alert("Layanan tidak ditemukan!");
+                    router.push('/admin');
+                }
+                setIsFetchingData(false);
+            };
+            fetchService();
+        }
+    }, [id, router]);
+    
     // Fungsi untuk mengelola input fitur
     const handleFeatureChange = (index, value) => {
         const newFeatures = [...features];
@@ -43,7 +67,7 @@ export default function CreateServicePage() {
     // Fungsi untuk mengelola blok konten
     const addBlock = (type) => {
         if (type === 'richText') {
-            setPageContent([...pageContent, { type: 'richText', content: '<p>Tulis paragraf penjelasan di sini...</p>' }]);
+            setPageContent([...pageContent, { type: 'richText', content: '<p>Teks baru...</p>' }]);
         }
         if (type === 'imageLeftTextRight') {
             setPageContent([...pageContent, {
@@ -61,21 +85,27 @@ export default function CreateServicePage() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!title || !slug || !shortDescription || !heroImage) {
-            alert("Judul, Slug, Deskripsi, dan Hero Image wajib diisi!");
+        if (!title || !slug || !shortDescription) {
+            alert("Judul, Slug, dan Deskripsi wajib diisi!");
             return;
         }
         setIsLoading(true);
 
         try {
-            const heroFormData = new FormData();
-            heroFormData.append('file', heroImage);
-            heroFormData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET);
-            const heroResponse = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`, { method: 'POST', body: heroFormData });
-            const heroData = await heroResponse.json();
-            if (!heroResponse.ok) throw new Error(heroData.error.message || 'Gagal upload hero image');
-            const heroImageUrl = heroData.secure_url;
+            let updatedHeroImageUrl = existingHeroImageUrl;
 
+            // Jika ada gambar baru yang diupload, ganti URL-nya
+            if (heroImage) {
+                const heroFormData = new FormData();
+                heroFormData.append('file', heroImage);
+                heroFormData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET);
+                const heroResponse = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`, { method: 'POST', body: heroFormData });
+                const heroData = await heroResponse.json();
+                if (!heroResponse.ok) throw new Error(heroData.error.message);
+                updatedHeroImageUrl = heroData.secure_url;
+            }
+            
+            // Proses gambar di dalam blok konten
             const processedPageContent = await Promise.all(pageContent.map(async (block) => {
                 if (block.type === 'imageLeftTextRight' && block.content.imageFile) {
                     const blockFormData = new FormData();
@@ -83,44 +113,45 @@ export default function CreateServicePage() {
                     blockFormData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET);
                     const blockResponse = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`, { method: 'POST', body: blockFormData });
                     const blockData = await blockResponse.json();
-                    if (!blockResponse.ok) throw new Error(blockData.error.message || 'Gagal upload block image');
+                    if (!blockResponse.ok) throw new Error(blockData.error.message);
                     return { ...block, content: { ...block.content, imageUrl: blockData.secure_url, imageFile: null } };
                 }
-                return block;
+                // Jika tidak ada file gambar baru, pastikan imageUrl yang lama tetap ada
+                return { ...block, content: { ...block.content, imageFile: null } };
             }));
 
-            await addDoc(collection(db, "services"), {
+            // Update dokumen yang sudah ada
+            const docRef = doc(db, 'services', id);
+            await updateDoc(docRef, {
                 title,
                 slug,
                 shortDescription,
-                heroImageUrl,
+                heroImageUrl: updatedHeroImageUrl,
                 pricingCategory,
                 featuresList: features.filter(f => f),
                 pageContent: processedPageContent,
-                createdAt: serverTimestamp(),
-                author: user.email,
-                published: true,
+                updatedAt: serverTimestamp(),
             });
 
-            alert("Layanan baru berhasil dibuat!");
+            alert("Layanan berhasil diupdate!");
             await fetch(`/api/revalidate?secret=${process.env.NEXT_PUBLIC_REVALIDATE_SECRET_TOKEN}&path=/layanan`);
             router.push('/admin');
         } catch (error) {
-            console.error("Error creating document: ", error);
-            alert(`Gagal membuat layanan: ${error.message}`);
+            console.error("Error updating document: ", error);
+            alert(`Gagal mengupdate layanan: ${error.message}`);
         } finally {
             setIsLoading(false);
         }
     };
 
-    if (loading) return <div className="bg-white text-black min-h-screen flex items-center justify-center">Loading...</div>;
+    if (loading || isFetchingData) return <div className="bg-white text-black min-h-screen flex items-center justify-center">Loading Service Data...</div>;
 
     if (user) {
         return (
             <div className="bg-white text-black min-h-screen p-8">
                 <div className="max-w-4xl mx-auto">
                     <Link href="/admin" className="text-blue-600 hover:underline mb-6 block">&larr; Back to Dashboard</Link>
-                    <h1 className="text-3xl font-bold mb-8">Create New Service</h1>
+                    <h1 className="text-3xl font-bold mb-8">Edit Service</h1>
                     <form onSubmit={handleSubmit} className="space-y-8">
                         <div className="p-6 bg-[#2ECC71]/10 rounded-lg space-y-4">
                             <div>
@@ -136,21 +167,22 @@ export default function CreateServicePage() {
                                 <select value={pricingCategory} onChange={(e) => setPricingCategory(e.target.value)} required className="w-full p-2 border border-gray-300 rounded-md bg-[#2ECC71]/15 text-black">
                                     <option value="seo">Jasa SEO</option>
                                     <option value="ads">Jasa Ads</option>
-                                    <option value="web">Jasa Web Design</option>
+                                    <option value="web-design">Jasa Web Design</option>
                                     <option value="app">Jasa App Development</option>
                                     <option value="dash">Jasa Dashboard</option>
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-lg font-medium mb-1">Deskripsi Singkat (untuk kartu layanan)</label>
+                                <label className="block text-lg font-medium mb-1">Deskripsi Singkat</label>
                                 <textarea value={shortDescription} onChange={(e) => setShortDescription(e.target.value)} rows={3} required className="w-full p-2 border border-gray-300 rounded-md bg-[#2ECC71]/15 text-black" />
                             </div>
                             <div>
-                                <label className="block text-lg font-medium mb-1">Gambar Utama (Hero Image)</label>
-                                <input type="file" onChange={(e) => setHeroImage(e.target.files[0])} accept="image/png, image/jpeg, image/webp" required className="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#2ECC71] file:text-white hover:file:bg-[#2ECC71]/80 file:cursor-pointer" />
+                                <label className="block text-lg font-medium mb-1">Ganti Gambar Utama (Opsional)</label>
+                                <input type="file" onChange={(e) => setHeroImage(e.target.files[0])} accept="image/png, image/jpeg, image/webp" className="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#2ECC71] file:text-white hover:file:bg-[#2ECC71]/80 file:cursor-pointer" />
+                                {existingHeroImageUrl && <p className="text-xs mt-2">Gambar saat ini: <a href={existingHeroImageUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">Lihat gambar</a></p>}
                             </div>
                             <div>
-                                <label className="block text-lg font-medium mb-2">Fitur Unggulan (Daftar List)</label>
+                                <label className="block text-lg font-medium mb-2">Fitur Unggulan</label>
                                 <div className="space-y-2">
                                     {features.map((feature, index) => (
                                         <div key={index} className="flex items-center gap-2">
@@ -183,8 +215,8 @@ export default function CreateServicePage() {
                                 </div>
                             </div>
                         </div>
-                        <button type="submit" disabled={isLoading} className="w-full px-6 py-4 bg-green-600 text-white font-bold rounded-md text-lg hover:bg-green-700 disabled:bg-gray-500">
-                            {isLoading ? 'Memproses...' : 'Publikasikan Layanan'}
+                        <button type="submit" disabled={isLoading} className="w-full px-6 py-4 bg-yellow-500 text-black font-bold rounded-md text-lg hover:bg-yellow-600 disabled:bg-gray-500">
+                            {isLoading ? 'Menyimpan Perubahan...' : 'Update Layanan'}
                         </button>
                     </form>
                 </div>
