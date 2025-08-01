@@ -1,6 +1,7 @@
 'use client';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import { useEffect } from 'react';
 
 const MenuBar = ({ editor }) => {
     if (!editor) return null;
@@ -14,9 +15,17 @@ const MenuBar = ({ editor }) => {
 };
 
 export default function TextBlock({ content, onUpdate }) {
+    // Fungsi untuk memperbaiki data konten yang formatnya salah (objek karakter menjadi string)
+    const getSanitizedContent = (data) => {
+        if (data && typeof data === 'object' && !Array.isArray(data) && Object.keys(data).length > 0 && Object.keys(data).every(k => !isNaN(Number(k)))) {
+            return Object.values(data).join('');
+        }
+        return data || '';
+    };
+
     const editor = useEditor({
         extensions: [StarterKit],
-        content: content,
+        content: getSanitizedContent(content), // Gunakan konten yang sudah dibersihkan
         immediatelyRender: false,
         onUpdate: ({ editor }) => {
             onUpdate(editor.getHTML());
@@ -27,6 +36,18 @@ export default function TextBlock({ content, onUpdate }) {
             },
         },
     });
+
+    // Perbaiki useEffect untuk sinkronisasi yang lebih aman
+    useEffect(() => {
+        if (editor && !editor.isDestroyed) {
+            const sanitized = getSanitizedContent(content);
+            // Hanya update editor jika konten dari props benar-benar berbeda
+            if (sanitized !== editor.getHTML()) {
+                editor.commands.setContent(sanitized, false);
+            }
+        }
+    }, [content, editor]);
+
 
     if (!editor) return null;
 

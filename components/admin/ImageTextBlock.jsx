@@ -2,6 +2,7 @@
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from 'next/image';
+import { useEffect } from 'react';
 
 const MenuBar = ({ editor }) => {
     if (!editor) return null;
@@ -15,9 +16,17 @@ const MenuBar = ({ editor }) => {
 };
 
 export default function ImageTextBlock({ content, onUpdate }) {
+    // Fungsi untuk memperbaiki data teks yang formatnya salah
+    const getSanitizedText = (textData) => {
+        if (textData && typeof textData === 'object' && !Array.isArray(textData) && Object.keys(textData).length > 0 && Object.keys(textData).every(k => !isNaN(Number(k)))) {
+            return Object.values(textData).join('');
+        }
+        return textData || '';
+    };
+
     const textEditor = useEditor({
         extensions: [StarterKit],
-        content: content.text,
+        content: getSanitizedText(content.text), // Gunakan teks yang sudah dibersihkan
         immediatelyRender: false,
         onUpdate: ({ editor }) => {
             onUpdate({ ...content, text: editor.getHTML() });
@@ -28,6 +37,17 @@ export default function ImageTextBlock({ content, onUpdate }) {
             },
         },
     });
+
+    // Tambahkan useEffect untuk sinkronisasi yang aman, agar konsisten dengan TextBlock
+    useEffect(() => {
+        if (textEditor && !textEditor.isDestroyed) {
+            const sanitized = getSanitizedText(content.text);
+            if (sanitized !== textEditor.getHTML()) {
+                textEditor.commands.setContent(sanitized, false);
+            }
+        }
+    }, [content.text, textEditor]);
+
 
     const handleImageChange = (file) => {
         if(file) {

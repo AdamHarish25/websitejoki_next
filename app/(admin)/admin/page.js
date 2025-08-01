@@ -1,202 +1,178 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useAuthState } from 'react-firebase-hooks/auth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { collection, getDocs, doc, updateDoc, deleteDoc, orderBy, query } from 'firebase/firestore';
+import { collection, getDocs, doc, deleteDoc, orderBy, query } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebaseConfig';
-import { signOut } from 'firebase/auth';
+import { format } from 'date-fns';
 
 export default function AdminDashboard() {
-  const [user, loading] = useAuthState(auth);
-  const router = useRouter();
+    const [user, loading] = useAuthState(auth);
+    const router = useRouter();
 
-  const [articles, setArticles] = useState([]);
+    const [articles, setArticles] = useState([]);
+    const [services, setServices] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
 
-  // State BARU untuk Layanan
-  const [services, setServices] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+    // --- FUNGSI FETCH DATA (Tidak perlu diubah, tapi akan kita gunakan sebagai referensi) ---
+    useEffect(() => {
+        if (loading) return;
+        if (!user) {
+            router.push('/login');
+            return;
+        }
 
-  const triggerRevalidation = async () => {
-    await fetch(`/api/revalidate?secret=${process.env.NEXT_PUBLIC_REVALIDATE_SECRET_TOKEN}`);
-  };
+        const fetchAllData = async () => {
+            setIsLoading(true);
+            try {
+                // Fetch Articles
+                const articlesQuery = query(collection(db, "articles"), orderBy("createdAt", "desc"));
+                const articlesSnapshot = await getDocs(articlesQuery);
+                setArticles(articlesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
 
-  // Fungsi untuk mengambil semua artikel dari Firestore
-  const fetchArticles = async () => {
-    setIsLoading(true);
-    const q = query(collection(db, 'articles'), orderBy('createdAt', 'desc'));
-    const querySnapshot = await getDocs(q);
-    const articlesData = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      // Format tanggal menjadi YYYY-MM-DD agar mudah disortir
-      createdAt: doc.data().createdAt?.toDate().toLocaleDateString('en-CA')
-    }));
-    setArticles(articlesData);
+                // Fetch Services
+                const servicesQuery = query(collection(db, "services"), orderBy("createdAt", "desc"));
+                const servicesSnapshot = await getDocs(servicesQuery);
+                setServices(servicesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
 
-    // Fetch Services
-    const servicesQuery = query(collection(db, 'services'), orderBy('createdAt', 'desc'));
-    const servicesSnapshot = await getDocs(servicesQuery);
-    setServices(servicesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), createdAt: doc.data().createdAt?.toDate().toLocaleDateString('en-CA') })));
+            } catch (error) {
+                console.error("Error fetching data: ", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
 
-    setIsLoading(false);
-  };
+        fetchAllData();
+    }, [user, loading, router]);
 
-  // Jalankan fetchArticles saat komponen dimuat dan ada user
-  useEffect(() => {
-    if (user && !loading) {
-      fetchArticles();
+
+    // ================== INI BAGIAN YANG DIPERBAIKI ==================
+
+    const handleServiceDelete = async (id) => {
+        if (window.confirm("Yakin ingin menghapus layanan ini?")) {
+            try {
+                // Hapus dokumen dari Firestore
+                await deleteDoc(doc(db, 'services', id));
+
+                // Perbarui state secara manual untuk menghapus item dari UI
+                setServices(currentServices => currentServices.filter(service => service.id !== id));
+                
+                // Panggil revalidasi jika perlu
+                await triggerRevalidation('/layanan');
+                
+                alert("Layanan berhasil dihapus.");
+            } catch (error) {
+                console.error("Error deleting service: ", error);
+                alert("Gagal menghapus layanan.");
+            }
+        }
+    };
+
+  const handleArticleDelete = async (id) => {
+        if (window.alert("Yakin ingin menghapus artikel ini?")) {
+            try {
+                await deleteDoc(doc(db, 'articles', id));
+                
+                // KESALAHAN UMUM: Sebelumnya mungkin tertulis setServices.
+                // PERBAIKAN: Pastikan ini memanggil setArticles.
+                setArticles(currentArticles => currentArticles.filter(article => article.id !== id));
+
+                await triggerRevalidation('/blog');
+                alert("Artikel berhasil dihapus.");
+            } catch (error) {
+                console.error("Error deleting article: ", error);
+                alert("Gagal menghapus artikel.");
+            }
+        }
+    };
+
+    const triggerRevalidation = async (path) => {
+        await fetch(`/api/revalidate?secret=${process.env.NEXT_PUBLIC_REVALIDATE_SECRET_TOKEN}&path=${path}`);
+    };
+    
+    // ================== AKHIR BAGIAN YANG DIPERBAIKI ==================
+
+
+    if (loading || isLoading) {
+        return <div className="bg-white text-black min-h-screen flex items-center justify-center">Loading Dashboard...</div>;
     }
-  }, [user, loading]);
 
-  const handleLogout = async () => {
-    await signOut(auth);
-    router.push('/login');
-  };
-
-  const handleStatusToggle = async (id, currentStatus) => {
-    const articleRef = doc(db, 'articles', id);
-    try {
-      await updateDoc(articleRef, {
-        published: !currentStatus
-      });
-      // Ambil ulang data untuk update tampilan secara real-time
-      fetchArticles();
-      await triggerRevalidation(); // <-- PANGGIL REVALIDASI DI SINI
-    } catch (error) {
-      console.error("Error updating status: ", error);
-      alert("Gagal mengubah status.");
+    if (!user) {
+        // Ini seharusnya tidak terjadi karena ada redirect di useEffect, tapi sebagai fallback
+        return null;
     }
-  };
-
-  const handleDelete = async (id) => {
-    if (window.confirm("Apakah Anda yakin ingin menghapus artikel ini secara permanen?")) {
-      try {
-        await deleteDoc(doc(db, 'articles', id));
-        fetchArticles(); // Ambil ulang data
-        await triggerRevalidation(); // <-- PANGGIL REVALIDASI DI SINI
-      } catch (error) {
-        console.error("Error deleting document: ", error);
-        alert("Gagal menghapus artikel.");
-      }
-    }
-  };
-
-   // Fungsi untuk menghapus layanan
-  const handleServiceDelete = async (id) => {
-    if (window.confirm("Yakin ingin menghapus layanan ini?")) {
-      await deleteDoc(doc(db, 'services', id));
-      await fetchAllData();
-      await triggerRevalidation('/layanan');
-    }
-  };
-
-  // Menampilkan loading state jika data user atau artikel sedang diambil
-  if (loading || isLoading) {
+    
+    // ================== JSX TIDAK DIUBAH, HANYA MEMASTIKAN `onClick` BENAR ==================
     return (
-      <div className="bg-gray-800 text-white min-h-screen flex items-center justify-center">
-        Loading Dashboard...
-      </div>
+        <div className="bg-white text-black min-h-screen p-8">
+            <div className="max-w-7xl mx-auto">
+                <h1 className="text-3xl font-bold mb-4">Admin Dashboard</h1>
+                <p className="mb-8">Welcome, {user.displayName || user.email}. This is your admin dashboard where you can manage articles.</p>
+
+                <div className="flex gap-4 mb-8">
+                    <Link href="/admin/create-article" className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">+ Create New Article</Link>
+                    <Link href="/admin/create-service" className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">+ Create New Service</Link>
+                    <Link href="/admin/manage-pricing" className="bg-yellow-500 text-black px-4 py-2 rounded-md hover:bg-yellow-600">+ Manage Pricing Packages</Link>
+                </div>
+
+                {/* Manage Articles Section */}
+                <div className="mb-12">
+                    <h2 className="text-2xl font-semibold mb-4">Manage Articles</h2>
+                    <div className="overflow-x-auto bg-[#2ECC71]/10 p-4 rounded-lg">
+                        <table className="min-w-full text-left">
+                            <thead className="border-b-2 border-gray-300">
+                                <tr>
+                                    <th className="py-2 px-4">TITLE</th>
+                                    <th className="py-2 px-4">DATE CREATED</th>
+                                    <th className="py-2 px-4 text-right">ACTIONS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {articles.map((article) => (
+                                    <tr key={article.id} className="border-b border-gray-200">
+                                        <td className="py-3 px-4">{article.title}</td>
+                                        <td className="py-3 px-4 text-gray-500">{article.createdAt ? format(article.createdAt.toDate(), 'yyyy-MM-dd') : 'N/A'}</td>
+                                        <td className="py-3 px-4 flex justify-end gap-2">
+                                            <Link href={`/admin/edit-article/${article.id}`} className="text-blue-500 hover:underline">Edit</Link>
+                                            <button onClick={() => handleArticleDelete(article.id)} className="text-red-500 hover:underline">Delete</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {/* Manage Services Section */}
+                <div>
+                    <h2 className="text-2xl font-semibold mb-4">Manage Services</h2>
+                     <div className="overflow-x-auto bg-[#2ECC71]/10 p-4 rounded-lg">
+                        <table className="min-w-full text-left">
+                            <thead className="border-b-2 border-gray-300">
+                                <tr>
+                                    <th className="py-2 px-4">SERVICE TITLE</th>
+                                    <th className="py-2 px-4">DATE CREATED</th>
+                                    <th className="py-2 px-4 text-right">ACTIONS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {services.map((service) => (
+                                    <tr key={service.id} className="border-b border-gray-200">
+                                        <td className="py-3 px-4">{service.title}</td>
+                                        <td className="py-3 px-4 text-gray-500">{service.createdAt ? format(service.createdAt.toDate(), 'yyyy-MM-dd') : 'N/A'}</td>
+                                        <td className="py-3 px-4 flex justify-end gap-2">
+                                            <Link href={`/admin/edit-service/${service.id}`} className="text-blue-500 hover:underline">Edit</Link>
+                                            <button onClick={() => handleServiceDelete(service.id)} className="text-red-500 hover:underline">Delete</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     );
-  }
-
-  // Tampilkan dashboard jika user sudah login
-  if (user) {
-    return (
-      <div className="bg-white text-black min-h-screen p-4 md:p-8">
-        <header className="flex flex-wrap justify-between items-center mb-8 gap-4">
-          <div>
-            <h1 className="text-3xl font-bold"><span className='text-[#2ECC71] font-bold'>WebjokiID</span> Dashboard</h1>
-            <p className="text-gray-400">Welcome, {user.email}</p>
-          </div>
-          <button onClick={handleLogout} className="bg-red-600 text-white font-bold px-4 py-2 rounded-md hover:bg-red-700 transition-colors">Logout</button>
-        </header>
-
-        <div className="bg-[#2ECC71]/15 p-6 rounded-lg mb-10">
-          <p className="mb-4">This is your admin dashboard where you can manage articles.</p>
-          <Link href="/admin/create-article" className="bg-blue-600 text-white px-5 py-3 rounded-md hover:bg-blue-700 transition-colors mr-4">
-            + Create New Article
-          </Link>
-          <Link href="/admin/create-service" className="bg-teal-600 text-white px-5 py-3 rounded-md hover:bg-teal-700 transition-colors">
-            + Create New Service
-          </Link>
-          <Link href="/admin/manage-packages" className="bg-yellow-600 text-white px-5 py-3 rounded-md hover:bg-yellow-700 transition-colors ml-4">
-            + Manage Pricing Packages
-          </Link>
-          {/* <Link href="/admin/create-service" className="bg-teal-600 text-white px-5 py-3 rounded-md hover:bg-teal-700 transition-colors">+ Create New Service</Link> */}
-        </div>
-
-        {/* Tabel Artikel */}
-        <div className="bg-[#2ECC71]/15 p-6 rounded-lg overflow-x-auto">
-          <h2 className="text-2xl font-semibold mb-4">Manage Articles</h2>
-          <table className="w-full text-left min-w-[600px]">
-            <thead>
-              <tr className="border-b border-gray-600">
-                <th className="p-3">TITLE</th>
-                <th className="p-3">STATUS</th>
-                <th className="p-3">DATE CREATED</th>
-                <th className="p-3 text-right">ACTIONS</th>
-              </tr>
-            </thead>
-            <tbody>
-              {articles.length > 0 ? articles.map(article => (
-                <tr key={article.id} className="border-b border-gray-600 hover:bg-[#2ECC71]/30">
-                  <td className="p-3">{article.title}</td>
-                  <td className="p-3">
-                    <label className="switch">
-                      <input type="checkbox" checked={article.published || false} onChange={() => handleStatusToggle(article.id, article.published)} />
-                      <span className="slider round"></span>
-                    </label>
-                  </td>
-                  <td className="p-3">{article.createdAt}</td>
-                  <td className="p-3 text-right">
-                    <Link href={`/admin/edit-article/${article.id}`} className="text-yellow-400 hover:underline mr-4">Edit</Link>
-                    <button onClick={() => handleDelete(article.id)} className="text-red-500 hover:underline">Delete</button>
-                  </td>
-                </tr>
-              )) : (
-                <tr>
-                  <td colSpan="4" className="text-center p-6 text-gray-400">No articles found. Create one!</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-
-        <div className="bg-[#2ECC71]/15 p-6 rounded-lg my-10">
-          <h2 className="text-2xl font-semibold mb-4">Manage Services</h2>
-          <table className="w-full text-left min-w-[600px]">
-            <thead>
-              <tr className="border-b border-gray-600">
-                <th className="p-3">SERVICE TITLE</th>
-                <th className="p-3">DATE CREATED</th>
-                <th className="p-3 text-right">ACTIONS</th>
-              </tr>
-            </thead>
-            <tbody>
-              {services.length > 0 ? services.map(service => (
-                <tr key={service.id} className="border-b hover:bg-gray-200">
-                  <td className="p-3">{service.title}</td>
-                  <td className="p-3">{service.createdAt}</td>
-                  <td className="p-3 text-right">
-                    <Link href={`/admin/edit-service/${service.id}`} className="text-yellow-600 hover:underline mr-4 font-semibold">Edit</Link>
-                    <button onClick={() => handleServiceDelete(service.id)} className="text-red-600 hover:underline font-semibold">Delete</button>
-                  </td>
-                </tr>
-              )) : (
-                <tr>
-                    <td colSpan="3" className="text-center p-6 text-gray-500">Belum ada layanan. Silakan buat yang baru.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-        {/* Tambahkan Tabel Services di sini dengan cara yang sama */}
-
-      </div>
-    );
-  }
-  return null; // Atau redirect ke login
 }

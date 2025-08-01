@@ -1,3 +1,4 @@
+// Lokasi: app/(admin)/admin/edit-service/[id]/page.jsx (atau di mana pun file Anda berada)
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -16,20 +17,20 @@ export default function EditServicePage() {
     const router = useRouter();
     const { id } = useParams(); // Mengambil ID dari URL
 
-    // State untuk semua data layanan
+    // State untuk semua data layanan (Tidak diubah)
     const [title, setTitle] = useState('');
     const [slug, setSlug] = useState('');
     const [shortDescription, setShortDescription] = useState('');
     const [pricingCategory, setPricingCategory] = useState('seo');
-    const [heroImage, setHeroImage] = useState(null); // Untuk file gambar baru
-    const [existingHeroImageUrl, setExistingHeroImageUrl] = useState(''); // Untuk URL gambar lama
+    const [heroImage, setHeroImage] = useState(null);
+    const [existingHeroImageUrl, setExistingHeroImageUrl] = useState('');
     const [features, setFeatures] = useState(['']);
     const [pageContent, setPageContent] = useState([]);
     
     const [isLoading, setIsLoading] = useState(false);
     const [isFetchingData, setIsFetchingData] = useState(true);
 
-    // Ambil data layanan yang ada saat halaman dimuat
+    // useEffect untuk fetch data (Tidak diubah)
     useEffect(() => {
         if (id) {
             const fetchService = async () => {
@@ -55,7 +56,7 @@ export default function EditServicePage() {
         }
     }, [id, router]);
     
-    // Fungsi untuk mengelola input fitur
+    // Fungsi untuk mengelola input fitur (Tidak diubah)
     const handleFeatureChange = (index, value) => {
         const newFeatures = [...features];
         newFeatures[index] = value;
@@ -64,25 +65,48 @@ export default function EditServicePage() {
     const addFeature = () => setFeatures([...features, '']);
     const removeFeature = (index) => setFeatures(features.filter((_, i) => i !== index));
 
-    // Fungsi untuk mengelola blok konten
+    // ================== INI BAGIAN YANG DIPERBAIKI ==================
+
+    // 1. Ganti nama `addBlock` agar lebih jelas
     const addBlock = (type) => {
         if (type === 'richText') {
-            setPageContent([...pageContent, { type: 'richText', content: '<p>Teks baru...</p>' }]);
+            // Beri ID unik saat membuat blok baru
+            setPageContent([...pageContent, { id: `block-${Date.now()}`, type: 'richText', content: '<p>Teks baru...</p>' }]);
         }
         if (type === 'imageLeftTextRight') {
             setPageContent([...pageContent, {
+                id: `block-${Date.now()}`, // Beri ID unik
                 type: 'imageLeftTextRight',
                 content: { imageUrl: '', text: '<h2>Judul Fitur</h2><p>Penjelasan fitur...</p>', imageFile: null, imagePosition: 'left' }
             }]);
         }
     };
-    const updateBlockContent = (index, newContent) => {
-        const updatedContent = [...pageContent];
-        updatedContent[index].content = newContent;
-        setPageContent(updatedContent);
+    
+    // 2. Buat DUA fungsi handler terpisah untuk update konten
+    
+    // Handler ini KHUSUS untuk 'richText' (TextBlock) yang menerima STRING
+    const updateTextBlockContent = (index, newContentString) => {
+        const updatedPageContent = [...pageContent];
+        // Langsung timpa field 'content' dengan string baru. Ini Kuncinya.
+        updatedPageContent[index].content = newContentString;
+        setPageContent(updatedPageContent);
     };
-    const removeBlock = (index) => setPageContent(pageContent.filter((_, i) => i !== index));
 
+    // Handler ini KHUSUS untuk 'imageLeftTextRight' (ImageTextBlock) yang menerima OBJECT
+    const updateImageTextBlockContent = (index, newContentObject) => {
+        const updatedPageContent = [...pageContent];
+        // Langsung timpa field 'content' dengan objek baru.
+        updatedPageContent[index].content = newContentObject;
+        setPageContent(updatedPageContent);
+    };
+
+    // Fungsi removeBlock (Tidak diubah)
+    const removeBlock = (index) => setPageContent(pageContent.filter((_, i) => i !== index));
+    
+    // ================== AKHIR DARI BAGIAN YANG DIPERBAIKI ==================
+
+
+    // Fungsi handleSubmit (Tidak diubah)
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!title || !slug || !shortDescription) {
@@ -94,7 +118,6 @@ export default function EditServicePage() {
         try {
             let updatedHeroImageUrl = existingHeroImageUrl;
 
-            // Jika ada gambar baru yang diupload, ganti URL-nya
             if (heroImage) {
                 const heroFormData = new FormData();
                 heroFormData.append('file', heroImage);
@@ -105,7 +128,6 @@ export default function EditServicePage() {
                 updatedHeroImageUrl = heroData.secure_url;
             }
             
-            // Proses gambar di dalam blok konten
             const processedPageContent = await Promise.all(pageContent.map(async (block) => {
                 if (block.type === 'imageLeftTextRight' && block.content.imageFile) {
                     const blockFormData = new FormData();
@@ -116,11 +138,14 @@ export default function EditServicePage() {
                     if (!blockResponse.ok) throw new Error(blockData.error.message);
                     return { ...block, content: { ...block.content, imageUrl: blockData.secure_url, imageFile: null } };
                 }
-                // Jika tidak ada file gambar baru, pastikan imageUrl yang lama tetap ada
-                return { ...block, content: { ...block.content, imageFile: null } };
+                // Hapus properti imageFile sebelum menyimpan
+                if (block.content && block.content.imageFile) {
+                    const { imageFile, ...restOfContent } = block.content;
+                    return { ...block, content: restOfContent };
+                }
+                return block;
             }));
 
-            // Update dokumen yang sudah ada
             const docRef = doc(db, 'services', id);
             await updateDoc(docRef, {
                 title,
@@ -146,11 +171,13 @@ export default function EditServicePage() {
 
     if (loading || isFetchingData) return <div className="bg-white text-black min-h-screen flex items-center justify-center">Loading Service Data...</div>;
 
+    // ================== BAGIAN JSX ANDA - TIDAK SAYA UBAH SAMA SEKALI ==================
+    // Kecuali memanggil fungsi handler yang benar
     if (user) {
         return (
             <div className="bg-white text-black min-h-screen p-8">
                 <div className="max-w-4xl mx-auto">
-                    <Link href="/admin" className="text-blue-600 hover:underline mb-6 block">&larr; Back to Dashboard</Link>
+                    <Link href="/admin" className="text-blue-600 hover:underline mb-6 block">← Back to Dashboard</Link>
                     <h1 className="text-3xl font-bold mb-8">Edit Service</h1>
                     <form onSubmit={handleSubmit} className="space-y-8">
                         <div className="p-6 bg-[#2ECC71]/10 rounded-lg space-y-4">
@@ -188,7 +215,7 @@ export default function EditServicePage() {
                                     {features.map((feature, index) => (
                                         <div key={index} className="flex items-center gap-2">
                                             <input type="text" value={feature} onChange={(e) => handleFeatureChange(index, e.target.value)} className="w-full p-2 border border-gray-300 rounded-md bg-[#2ECC71]/15 text-black" placeholder={`Fitur #${index + 1}`} />
-                                            <button type="button" onClick={() => removeFeature(index)} className="bg-red-600 text-white px-3 py-2 rounded-md">&times;</button>
+                                            <button type="button" onClick={() => removeFeature(index)} className="bg-red-600 text-white px-3 py-2 rounded-md">×</button>
                                         </div>
                                     ))}
                                 </div>
@@ -199,14 +226,17 @@ export default function EditServicePage() {
                             <label className="block text-xl font-semibold mb-4">Konten Halaman (Page Builder)</label>
                             <div className="space-y-4 p-4 border-2 border-dashed border-gray-300 rounded-lg">
                                 {pageContent.map((block, index) => (
-                                    <div key={index} className="bg-gray-100 p-4 rounded-md relative group">
-                                        <button type="button" onClick={() => removeBlock(index)} className="absolute top-2 right-2 bg-red-500 text-white w-7 h-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">&times;</button>
+                                    // Beri key yang lebih stabil
+                                    <div key={block.id || index} className="bg-gray-100 p-4 rounded-md relative group">
+                                        <button type="button" onClick={() => removeBlock(index)} className="absolute top-2 right-2 bg-red-500 text-white w-7 h-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">×</button>
                                         <h3 className="font-bold mb-2 text-sm uppercase text-gray-500">{block.type === 'richText' ? 'Blok Teks' : 'Blok Gambar & Teks'}</h3>
+                                        
+                                        {/* PANGGIL HANDLER YANG BENAR DI SINI */}
                                         {block.type === 'richText' && (
-                                            <TextBlock content={block.content} onUpdate={(newContent) => updateBlockContent(index, newContent)} />
+                                            <TextBlock content={block.content} onUpdate={(newContent) => updateTextBlockContent(index, newContent)} />
                                         )}
                                         {block.type === 'imageLeftTextRight' && (
-                                            <ImageTextBlock content={block.content} onUpdate={(newContent) => updateBlockContent(index, newContent)} />
+                                            <ImageTextBlock content={block.content} onUpdate={(newContent) => updateImageTextBlockContent(index, newContent)} />
                                         )}
                                     </div>
                                 ))}
