@@ -34,7 +34,8 @@ async function getArticle(slug) {
 }
 
 export async function generateMetadata({ params }) {
-  const article = await getArticle(params.slug);
+  const { slug } = await params;
+  const article = await getArticle(slug);
 
   if (!article) {
     return { title: "Artikel Tidak Ditemukan" };
@@ -90,7 +91,8 @@ export async function generateStaticParams() {
 export const revalidate = 60;
 
 export default async function ArticlePage({ params }) {
-  const article = await getArticle(params.slug);
+  const { slug } = await params;
+  const article = await getArticle(slug);
 
   const { headings, modifiedContent } = extractHeadings(article.content);
 
@@ -105,10 +107,12 @@ export default async function ArticlePage({ params }) {
         {headings.length > 0 && <TableOfContents headings={headings} />}
 
         <div className="relative w-full aspect-video rounded-lg overflow-hidden mb-5 shadow-lg">
-          <img
+          <Image
             src={article.coverImageUrl}
             alt={`Gambar cover untuk artikel ${article.title}`}
             className="object-cover object-center w-full h-full"
+            width={800}
+            height={450}
           />
         </div>
         <p className='text-gray-400 pb-10'>Source: Pexels.com</p>

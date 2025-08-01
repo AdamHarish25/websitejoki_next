@@ -74,6 +74,8 @@ export default function ManagePackagesPage() {
                             <option value="web">Jasa Web Design</option>
                             <option value="app">Jasa App Development</option>
                             <option value="dash">Jasa Dashboard</option>
+                            <option value="brand">Jasa Branding</option>
+
                         </select>
                     </div>
                     <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Nama Paket (e.g., STARTER)" className="w-full p-2 bg-gray-800 rounded" />

@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { FaTimes, FaWhatsapp } from 'react-icons/fa';
 import { FiMenu, FiX } from 'react-icons/fi';
 import { trackEvent } from '@/lib/analytics';
+import { RefreshingLink } from './RefreshingLink';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -44,17 +45,17 @@ export default function Navbar() {
 
         {/* Logo */}
         <div className="flex-shrink-0">
-          <Link href="/" onClick={closeMenu}>
+          <RefreshingLink href="/" clicked={closeMenu}>
             <Image src={"/Logo.svg"} alt="Website Logo" width={180} height={40} priority />
-          </Link>
+          </RefreshingLink>
         </div>
 
         {/* Navigasi Desktop */}
         <div className="hidden lg:flex items-center space-x-8">
           {navLinks.map((link) => (
-            <Link key={link.name} href={link.href} className="text-gray-600 hover:text-green-600 capitalize">
+            <RefreshingLink key={link.name} href={link.href} className="text-gray-600 hover:text-green-600 capitalize">
               {link.name}
-            </Link>
+            </RefreshingLink>
           ))}
         </div>
 
@@ -75,9 +76,9 @@ export default function Navbar() {
       <div className={`absolute top-0 right-0 h-screen w-full max-w-full bg-white shadow-xl z-30 transform transition-transform duration-300 ease-in-out ${isMenuOpen ? 'translate-x-0 block' : 'translate-x-full hidden'}`}>
         <div className="p-8 flex flex-col space-y-8 mt-16 bg-white">
           {navLinks.map((link) => (
-            <Link key={link.name} href={link.href} onClick={closeMenu} className="text-2xl text-gray-700 hover:text-green-600 capitalize">
+            <RefreshingLink key={link.name} href={link.href} clicked={closeMenu} className="text-2xl text-gray-700 hover:text-green-600 capitalize">
               {link.name}
-            </Link>
+            </RefreshingLink>
           ))}
           <Link href="https://wa.me/6285179808325" target="_blank" onClick={() => {
             closeMenu(),

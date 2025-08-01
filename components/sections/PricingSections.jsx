@@ -49,10 +49,10 @@ export default function PricingSection({category}) {
                             )}
 
                             <h3 className="text-2xl font-bold text-center">{pkg.name}</h3>
-                            <p className="text-green-600 dark:text-green-400 font-semibold text-center mt-1">{pkg.subtitle}</p>
+                            <p className="text-green-600 dark:text-green-400 font-semibold text-sm md:text-base text-center mt-1">{pkg.subtitle}</p>
                             
                             <div className="my-6 text-center">
-                                <span className="text-5xl font-extrabold">Rp.{pkg.price}</span>
+                                <span className="text-4xl lg:text-5xl font-extrabold">Rp.{pkg.price}</span>
                                 <span className="text-gray-500 dark:text-gray-400">{pkg.pricePeriod}</span>
                             </div>
 
@@ -68,7 +68,7 @@ export default function PricingSection({category}) {
                             </ul>
 
                             <div className="mt-10">
-                                <Link href="/#kontak" className={`w-full text-center block px-6 py-3 rounded-md font-semibold transition-colors ${pkg.isPopular ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'}`}>
+                                <Link href="https://wa.me/6285179808325" className={`w-full text-center block px-6 py-3 rounded-md font-semibold transition-colors ${pkg.isPopular ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'}`}>
                                     Pilih Paket
                                 </Link>
                             </div>

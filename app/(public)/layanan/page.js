@@ -1,5 +1,6 @@
 import { db } from '@/lib/firebaseConfig';
 import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
+import Image from 'next/image';
 import Link from 'next/link';
 
 async function getServices() {
@@ -34,6 +35,7 @@ const dataBanner = [
     category: 'seo',
     banner: './services/SEO.svg',
   },
+  { category: 'brand', banner: './services/HakMerk.svg' }
 ]
 
 export default async function ServicesPage() {
@@ -61,11 +63,14 @@ export default async function ServicesPage() {
               <div className="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 h-fit flex flex-col">
                 {/* Bagian Gambar/Banner */}
                 <div className="relative w-full h-fit bg-[#2ECC71]/10 dark:bg-gray-800 flex items-center justify-center p-3">
-                  <img
+                  <Image
                     // Gunakan properti 'banner' yang baru kita tambahkan
                     src={service.banner}
                     alt={`Ikon untuk layanan ${service.title}`}
                     className="object-cover w-full h-full rounded-xl group-hover:scale-105 transition-transform duration-300"
+                    width={500}
+                    height={300}
+                    priority
                   />
                 </div>
                 {/* Bagian Teks */}

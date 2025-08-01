@@ -42,10 +42,12 @@ export default async function BlogPage() {
               <Link key={article.id} href={`/blog/${article.slug}`} className="block group">
                 <div className="hover:border-2 border-[#2ECC71] transition-transform duration-400 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 h-full flex flex-col">
                   <div className="relative w-full h-52">
-                    <img
+                    <Image
                       src={article.coverImageUrl}
                       alt={`Gambar cover untuk artikel ${article.title}`}
                       className="object-cover w-full h-52"
+                      width={800}
+                      height={450}
                     />
                   </div>
                   <div className="p-6 flex flex-col flex-grow bg-white dark:bg-gray-800 space-y-6">

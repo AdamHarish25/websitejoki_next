@@ -170,6 +170,7 @@ export default function EditServicePage() {
                                     <option value="web-design">Jasa Web Design</option>
                                     <option value="app">Jasa App Development</option>
                                     <option value="dash">Jasa Dashboard</option>
+                                    <option value="brand">Jasa Branding</option>
                                 </select>
                             </div>
                             <div>
