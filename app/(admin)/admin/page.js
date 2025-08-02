@@ -47,6 +47,16 @@ export default function AdminDashboard() {
         fetchAllData();
     }, [user, loading, router]);
 
+    const handleLogout = async () => {
+        try {
+            await auth.signOut();
+            router.push('/login');
+        } catch (error) {
+            console.error('Logout error:', error);
+            alert('Gagal logout.');
+        }
+    };
+
 
     // ================== INI BAGIAN YANG DIPERBAIKI ==================
 
@@ -58,10 +68,10 @@ export default function AdminDashboard() {
 
                 // Perbarui state secara manual untuk menghapus item dari UI
                 setServices(currentServices => currentServices.filter(service => service.id !== id));
-                
+
                 // Panggil revalidasi jika perlu
                 await triggerRevalidation('/layanan');
-                
+
                 alert("Layanan berhasil dihapus.");
             } catch (error) {
                 console.error("Error deleting service: ", error);
@@ -70,11 +80,11 @@ export default function AdminDashboard() {
         }
     };
 
-  const handleArticleDelete = async (id) => {
+    const handleArticleDelete = async (id) => {
         if (window.alert("Yakin ingin menghapus artikel ini?")) {
             try {
                 await deleteDoc(doc(db, 'articles', id));
-                
+
                 // KESALAHAN UMUM: Sebelumnya mungkin tertulis setServices.
                 // PERBAIKAN: Pastikan ini memanggil setArticles.
                 setArticles(currentArticles => currentArticles.filter(article => article.id !== id));
@@ -91,7 +101,7 @@ export default function AdminDashboard() {
     const triggerRevalidation = async (path) => {
         await fetch(`/api/revalidate?secret=${process.env.NEXT_PUBLIC_REVALIDATE_SECRET_TOKEN}&path=${path}`);
     };
-    
+
     // ================== AKHIR BAGIAN YANG DIPERBAIKI ==================
 
 
@@ -103,20 +113,25 @@ export default function AdminDashboard() {
         // Ini seharusnya tidak terjadi karena ada redirect di useEffect, tapi sebagai fallback
         return null;
     }
-    
+
     // ================== JSX TIDAK DIUBAH, HANYA MEMASTIKAN `onClick` BENAR ==================
     return (
         <div className="bg-white text-black min-h-screen p-8">
             <div className="max-w-7xl mx-auto">
-                <h1 className="text-3xl font-bold mb-4">Admin Dashboard</h1>
-                <p className="mb-8">Welcome, {user.displayName || user.email}. This is your admin dashboard where you can manage articles.</p>
 
+                <div className='flex justify-between items-center mb-8'>
+                    <div>
+                        <h1 className="text-3xl font-bold mb-4">Admin Dashboard</h1>
+                        <p className="mb-8">Welcome, {user.displayName || user.email}. This is your admin dashboard where you can manage articles.</p>
+
+                    </div>
+                    <button className='text-white px-4 py-2 rounded-md bg-red-600 hover:bg-red-700' onClick={handleLogout}>Logout</button>
+                </div>
                 <div className="flex gap-4 mb-8">
                     <Link href="/admin/create-article" className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">+ Create New Article</Link>
                     <Link href="/admin/create-service" className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">+ Create New Service</Link>
-                    <Link href="/admin/manage-pricing" className="bg-yellow-500 text-black px-4 py-2 rounded-md hover:bg-yellow-600">+ Manage Pricing Packages</Link>
+                    <Link href="/admin/manage-packages" className="bg-yellow-500 text-black px-4 py-2 rounded-md hover:bg-yellow-600">+ Manage Pricing Packages</Link>
                 </div>
-
                 {/* Manage Articles Section */}
                 <div className="mb-12">
                     <h2 className="text-2xl font-semibold mb-4">Manage Articles</h2>
@@ -148,7 +163,7 @@ export default function AdminDashboard() {
                 {/* Manage Services Section */}
                 <div>
                     <h2 className="text-2xl font-semibold mb-4">Manage Services</h2>
-                     <div className="overflow-x-auto bg-[#2ECC71]/10 p-4 rounded-lg">
+                    <div className="overflow-x-auto bg-[#2ECC71]/10 p-4 rounded-lg">
                         <table className="min-w-full text-left">
                             <thead className="border-b-2 border-gray-300">
                                 <tr>

@@ -24,7 +24,7 @@ const MenuBar = ({ editor }) => {
     return (
         <div className="border border-white bg-[#2ECC71]/50 rounded-t-md p-2 flex flex-wrap gap-x-3 gap-y-2">
             {menuButtons.map(btn => (
-                <button key={btn.name} type="button" onClick={btn.action} className={editor.isActive(btn.active, { level: btn.level }) ? 'is-active' : 'px-2 py-1 rounded hover:bg-green-700 text-white font-bold'}>
+                <button key={btn.name} type="button" onClick={btn.action} className={editor.isActive(btn.active, { level: btn.level }) ? 'is-active' : 'px-2 py-1 rounded hover:bg-green-700 text-white  font-bold'}>
                     {btn.name}
                 </button>
             ))}

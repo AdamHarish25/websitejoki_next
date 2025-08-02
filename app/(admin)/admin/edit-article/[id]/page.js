@@ -21,7 +21,7 @@ const MenuBar = ({ editor }) => {
         { name: 'Ordered List', action: () => editor.chain().focus().toggleOrderedList().run(), active: 'orderedList' },
     ];
     return (
-        <div className="border border-gray-600 bg-[#2ECC71]/50 rounded-t-md p-2 flex flex-wrap gap-x-3 gap-y-2">
+        <div className="bg-[#2ECC71]/50 text-white font-bold rounded-t-md p-2 flex flex-wrap gap-x-3 gap-y-2">
             {menuButtons.map(btn => (
                 <button key={btn.name} type="button" onClick={btn.action} className={editor.isActive(btn.active, { level: btn.level }) ? 'is-active' : 'px-2 py-1 rounded hover:bg-gray-600 hover:text-white'}>
                     {btn.name}
@@ -46,7 +46,7 @@ export default function EditArticlePage() {
         immediatelyRender: false,
         editorProps: {
             attributes: {
-                class: 'prose max-w-none p-4 border-b border-x border-gray-600 bg-[#2ECC71]/50 text-black rounded-b-md min-h-[300px] focus:outline-none',
+                class: 'prose max-w-none p-4 bg-[#2ECC71]/50 text-black rounded-b-md min-h-[300px] focus:outline-none',
             },
         },
     });
@@ -108,11 +108,11 @@ export default function EditArticlePage() {
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
                         <label className="block text-lg font-medium mb-1">Judul Artikel</label>
-                        <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required className="w-full p-2 border border-gray-600 rounded-md bg-[#2ECC71]/50 text-black focus:ring-yellow-400 focus:border-yellow-400" />
+                        <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required className="w-full p-2 rounded-md bg-[#2ECC71]/50 text-black focus:ring-yellow-400 focus:border-yellow-400" />
                     </div>
                     <div>
                         <label className="block text-lg font-medium mb-1">Slug (URL)</label>
-                        <input type="text" value={slug} onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''))} required className="w-full p-2 border border-gray-600 rounded-md bg-[#2ECC71]/50 text-black focus:ring-yellow-400 focus:border-yellow-400" />
+                        <input type="text" value={slug} onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''))} required className="w-full p-2 rounded-md bg-[#2ECC71]/50 text-black focus:ring-yellow-400 focus:border-yellow-400" />
                     </div>
 
                     <div>
@@ -123,7 +123,7 @@ export default function EditArticlePage() {
                             rows={3}
                             maxLength={160}
                             required
-                            className="w-full p-2 border border-gray-300 rounded-md bg-[#2ECC71]/50 text-black focus:ring-yellow-400 focus:border-yellow-400"
+                            className="w-full p-2 rounded-md bg-[#2ECC71]/50 text-black focus:ring-yellow-400 focus:border-yellow-400"
                         />
                         <p className="text-sm text-right">{metaDescription.length} / 160</p>
                     </div>
