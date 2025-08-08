@@ -6,8 +6,8 @@ const inter = Inter({ subsets: ['latin'] });
 const GA_TRACKING_ID = "G-X1F87S6FBB"; // <-- ID Anda dari screenshot
 
 export const metadata = {
-  title: 'WEBSITEJOKI.ID - Solusi Digital untuk Bisnis Anda',
-  description: 'Jasa pembuatan Website, Google Ads, Aplikasi, dan SEO.',
+  title: 'WebsiteJokiID: Jasa Website, Aplikasi, & Digital Marketing',
+  description: 'Butuh website profesional, aplikasi custom, atau jasa Google Ads? WebsiteJokiID hadir sebagai solusi digital untuk level up bisnis Anda. Konsultasi gratis!',
 };
 
 
