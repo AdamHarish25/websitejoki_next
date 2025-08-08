@@ -10,6 +10,7 @@ export const metadata = {
   description: 'Jasa pembuatan Website, Google Ads, Aplikasi, dan SEO.',
 };
 
+
 export default function RootLayout({ children }) {  
   return (
     <html lang="en">
