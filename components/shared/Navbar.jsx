@@ -45,9 +45,9 @@ export default function Navbar() {
 
         {/* Logo */}
         <div className="flex-shrink-0">
-          <RefreshingLink href="/" clicked={closeMenu}>
+          <Link href="/" onClick={closeMenu}>
             <Image src={"/Logo.svg"} alt="Website Logo" width={180} height={40} priority />
-          </RefreshingLink>
+          </Link>
         </div>
 
         {/* Navigasi Desktop */}

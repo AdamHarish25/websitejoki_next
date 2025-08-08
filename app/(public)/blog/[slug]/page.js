@@ -1,14 +1,32 @@
+// Lokasi: app/blog/[slug]/page.jsx
+
 import CtaSection from '@/components/sections/CTASection';
 import FaqSection from '@/components/sections/FaqSection';
-import AnimatedSection from '@/components/shared/AnimatedSection';
 import FloatingWhatsApp from '@/components/shared/floatingWAButton';
 import { db } from '@/lib/firebaseConfig';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import TableOfContents from '@/components/blog/tableofcontents'; // <-- Impor komponen baru
-import { JSDOM } from 'jsdom'; // <-- Impor JSDOM untuk membaca HTML
+import TableOfContents from '@/components/blog/tableofcontents';
+import { JSDOM } from 'jsdom';
 
+// ===================================================================
+// PERUBAHAN UTAMA DI SINI
+// ===================================================================
+
+// Hapus atau beri komentar pada fungsi generateStaticParams dan revalidate
+/*
+export async function generateStaticParams() {
+  // ... FUNGSI INI DITIDAKAKTIFKAN
+}
+*/
+// export const revalidate = 60; // <-- HAPUS ATAU KOMENTARI BARIS INI
+
+// TAMBAHKAN BARIS INI untuk memaksa Server-Side Rendering (SSR)
+// Ini memastikan data selalu di-fetch dari Firestore setiap kali halaman dibuka.
+export const dynamic = 'force-dynamic';
+
+// ===================================================================
 
 async function getArticle(slug) {
   const q = query(collection(db, "articles"), where("slug", "==", slug));
@@ -20,7 +38,6 @@ async function getArticle(slug) {
 
   const articleData = querySnapshot.docs[0].data();
 
-  // Menambahkan validasi: jika artikel ada tapi tidak dipublish, anggap tidak ditemukan
   if (articleData.published !== true) {
     notFound();
   }
@@ -40,55 +57,44 @@ export async function generateMetadata({ params }) {
   if (!article) {
     return { title: "Artikel Tidak Ditemukan" };
   }
+  
+  const description = article.metaDescription || (article.content ? article.content.replace(/<[^>]+>/g, '').substring(0, 155) + '...' : '');
 
   return {
     title: `${article.title} | WebsiteJoki.ID`,
-    // Gunakan metaDescription dari database, atau potong konten jika kosong
-    description: article.metaDescription || article.content.replace(/<[^>]+>/g, '').substring(0, 155) + '...',
+    description: description,
     openGraph: {
       title: article.title,
-      description: article.metaDescription || article.content.replace(/<[^>]+>/g, '').substring(0, 155) + '...',
+      description: description,
       images: [{ url: article.coverImageUrl }],
     },
   };
 }
 
 function extractHeadings(content) {
+    if (!content || typeof content !== 'string') {
+        return { headings: [], modifiedContent: '' };
+    }
   const dom = new JSDOM(content);
   const document = dom.window.document;
   const headings = Array.from(document.querySelectorAll('h2, h3'));
 
   const toc = headings.map(h => {
-    const id = h.textContent.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-    h.setAttribute('id', id); // Tambahkan ID ke elemen heading
+    const text = h.textContent || '';
+    const id = text.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    h.setAttribute('id', id);
     return {
       level: parseInt(h.tagName.substring(1)),
-      text: h.textContent,
+      text: text,
       id: id,
     };
   });
 
-  // Kembalikan daftar heading DAN konten yang sudah dimodifikasi
   return {
     headings: toc,
     modifiedContent: document.body.innerHTML,
   };
 }
-
-
-export async function generateStaticParams() {
-  const articlesCol = collection(db, 'articles');
-  // Menambahkan filter untuk hanya membuat halaman statis bagi artikel yang dipublish
-  const q = query(articlesCol, where("published", "==", true));
-  const articleSnapshot = await getDocs(q);
-  const paths = articleSnapshot.docs.map(doc => ({
-    slug: doc.data().slug || '',
-  })).filter(path => path.slug);
-
-  return paths;
-}
-
-export const revalidate = 60;
 
 export default async function ArticlePage({ params }) {
   const { slug } = await params;

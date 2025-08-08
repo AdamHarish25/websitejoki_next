@@ -12,8 +12,8 @@ export function RefreshingLink({ clicked = () => {}, ...props }) {
   };
 
   return (
-    <a {...props} onClick={handleClick}>
+    <Link {...props} onClick={handleClick}>
       {props.children}
-    </a>
+    </Link>
   );
 }
