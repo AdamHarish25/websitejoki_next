@@ -3,7 +3,7 @@ import Script from 'next/script'; // 1. Impor komponen Script
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
-const GA_TRACKING_ID = "G-3964PBF2BZ"; // <-- ID Anda dari screenshot
+const GA_TRACKING_ID = "G-X1F87S6FBB"; // <-- ID Anda dari screenshot
 
 export const metadata = {
   title: 'WEBSITEJOKI.ID - Solusi Digital untuk Bisnis Anda',
