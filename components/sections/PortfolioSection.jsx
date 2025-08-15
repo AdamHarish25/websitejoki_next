@@ -9,7 +9,7 @@ export default function PortfolioSection() {
             image: "/portfolio/Adaloker.png", // Ganti dengan path gambar Anda
             logo: "/portfolio/logo/Adaloker.svg", // Ganti dengan path logo Anda
             alt: "Mockup dashboard website pencarian kerja berwarna gelap",
-            link: "https://adaloker.vercel.app/"
+            link: "https://adaloker.netlify.app/"
         },
         {
             title: "TobaLawfirm - Layanan Hukum Terpercaya",
