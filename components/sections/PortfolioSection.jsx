@@ -8,25 +8,29 @@ export default function PortfolioSection() {
             title: "Ada Loker - Dashboard Pencarian Kerja",
             image: "/portfolio/Adaloker.png", // Ganti dengan path gambar Anda
             logo: "/portfolio/logo/Adaloker.svg", // Ganti dengan path logo Anda
-            alt: "Mockup dashboard website pencarian kerja berwarna gelap"
+            alt: "Mockup dashboard website pencarian kerja berwarna gelap",
+            link: "https://adaloker.vercel.app/"
         },
         {
             title: "TobaLawfirm - Layanan Hukum Terpercaya",
             image: "/portfolio/TobalawFirm.png", // Ganti dengan path gambar Anda
             logo: "/portfolio/logo/tobalaw.jpg", // Ganti dengan path logo Anda
-            alt: "Mockup sistem informasi hotel menampilkan daftar kamar"
+            alt: "Mockup sistem informasi hotel menampilkan daftar kamar",
+            link: "https://tobalaw.my.id"
         },
         {
             title: "BeeJoys - Travel Landing Page",
             image: "/portfolio/Beejoys.png", // Ganti dengan path gambar Anda
             logo: "/portfolio/logo/BeeJoys.svg", // Ganti dengan path logo Anda
-            alt: "Mockup landing page untuk agen travel BeeJoys"
+            alt: "Mockup landing page untuk agen travel BeeJoys",
+            link: "https://beejoystravel.netlify.app/"
         },
         {
             title: "Sinefolis - Platform Booking Sinema Terbaik",
             image: "/portfolio/Sinefolis.png", // Ganti dengan path gambar Anda
             logo: "/portfolio/logo/Sinefolis.svg", // Ganti dengan path logo Anda
-            alt: "Mockup halaman penawaran spesial untuk produk fashion"
+            alt: "Mockup halaman penawaran spesial untuk produk fashion",
+            link: "https://sinefolis-movies.netlify.app/"
         },
     ];
 
@@ -44,7 +48,7 @@ export default function PortfolioSection() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {projects.map((project) => (
-                        <Link key={project.title} href="#" className="block group">
+                        <Link key={project.title} href={project.link} className="block group">
                             <div className="relative overflow-hidden rounded-lg shadow-lg aspect-video bg-white">
                                 {/* Gambar Utama Proyek */}
                                 <Image
