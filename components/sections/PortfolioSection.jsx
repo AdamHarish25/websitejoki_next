@@ -16,7 +16,7 @@ export default function PortfolioSection() {
             image: "/portfolio/TobalawFirm.png", // Ganti dengan path gambar Anda
             logo: "/portfolio/logo/tobalaw.jpg", // Ganti dengan path logo Anda
             alt: "Mockup sistem informasi hotel menampilkan daftar kamar",
-            link: "https://tobalaw.my.id"
+            link: "https://tobalaw.com"
         },
         {
             title: "BeeJoys - Travel Landing Page",
