@@ -106,7 +106,7 @@ export default function AdminDashboard() {
 
 
     if (loading || isLoading) {
-        return <div className="bg-white text-black min-h-screen flex items-center justify-center">Loading Dashboard...</div>;
+        return <div className="bg-white dark:bg-gray-900 text-black dark:text-gray-100 min-h-screen flex items-center justify-center">Loading Dashboard...</div>;
     }
 
     if (!user) {
@@ -116,7 +116,7 @@ export default function AdminDashboard() {
 
     // ================== JSX TIDAK DIUBAH, HANYA MEMASTIKAN `onClick` BENAR ==================
     return (
-        <div className="bg-white text-black min-h-screen p-8">
+        <div className="bg-white dark:bg-gray-900 text-black dark:text-gray-100 min-h-screen p-8">
             <div className="max-w-7xl mx-auto">
 
                 <div className='flex justify-between items-center mb-8'>

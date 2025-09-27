@@ -21,7 +21,7 @@ const MenuBar = ({ editor }) => {
         { name: 'Ordered List', action: () => editor.chain().focus().toggleOrderedList().run(), active: 'orderedList' },
     ];
     return (
-        <div className="bg-[#2ECC71]/50 text-white font-bold rounded-t-md p-2 flex flex-wrap gap-x-3 gap-y-2">
+        <div className="bg-[#2ECC71]/50 dark:bg-gray-800 text-white font-bold rounded-t-md p-2 flex flex-wrap gap-x-3 gap-y-2">
             {menuButtons.map(btn => (
                 <button key={btn.name} type="button" onClick={btn.action} className={editor.isActive(btn.active, { level: btn.level }) ? 'is-active' : 'px-2 py-1 rounded hover:bg-gray-600 hover:text-white'}>
                     {btn.name}
@@ -46,7 +46,7 @@ export default function EditArticlePage() {
         immediatelyRender: false,
         editorProps: {
             attributes: {
-                class: 'prose max-w-none p-4 bg-[#2ECC71]/50 text-black rounded-b-md min-h-[300px] focus:outline-none',
+                class: 'prose max-w-none p-4 bg-[#2ECC71]/50 dark:bg-white text-black rounded-b-md min-h-[300px] focus:outline-none',
             },
         },
     });
@@ -101,18 +101,18 @@ export default function EditArticlePage() {
     };
 
     return (
-        <div className="bg-white text-black min-h-screen p-8">
+        <div className="bg-white dark:bg-gray-900 text-black dark:text-gray-100 min-h-screen p-8">
             <div className="max-w-4xl mx-auto">
-                <Link href="/admin" className="text-yellow-400 hover:underline mb-6 block">&larr; Back to Dashboard</Link>
+                <Link href="/admin" className="text-blue-600 dark:text-white hover:underline mb-6 block">&larr; Back to Dashboard</Link>
                 <h1 className="text-3xl font-bold mb-8">Edit Article</h1>
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
                         <label className="block text-lg font-medium mb-1">Judul Artikel</label>
-                        <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required className="w-full p-2 rounded-md bg-[#2ECC71]/50 text-black focus:ring-yellow-400 focus:border-yellow-400" />
+                        <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required className="w-full p-2 rounded-md bg-[#2ECC71]/50 text-black dark:text-gray-100 focus:ring-yellow-400 focus:border-yellow-400" />
                     </div>
                     <div>
                         <label className="block text-lg font-medium mb-1">Slug (URL)</label>
-                        <input type="text" value={slug} onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''))} required className="w-full p-2 rounded-md bg-[#2ECC71]/50 text-black focus:ring-yellow-400 focus:border-yellow-400" />
+                        <input type="text" value={slug} onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''))} required className="w-full p-2 rounded-md bg-[#2ECC71]/50 text-black dark:text-gray-100 focus:ring-yellow-400 focus:border-yellow-400" />
                     </div>
 
                     <div>
@@ -123,7 +123,7 @@ export default function EditArticlePage() {
                             rows={3}
                             maxLength={160}
                             required
-                            className="w-full p-2 rounded-md bg-[#2ECC71]/50 text-black focus:ring-yellow-400 focus:border-yellow-400"
+                            className="w-full p-2 rounded-md bg-[#2ECC71]/50 text-black dark:text-gray-100 focus:ring-yellow-400 focus:border-yellow-400"
                         />
                         <p className="text-sm text-right">{metaDescription.length} / 160</p>
                     </div>

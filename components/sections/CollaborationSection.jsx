@@ -29,10 +29,10 @@ export default function CollaborationSection() {
             </div>
 
             <div className="space-y-8 lg:space-y-4 grid place-content-end w-full p-0">
-                <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
+                <h2 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">
                     Partner Kolaborasi Kreatif Anda
                 </h2>
-                <p className="text-gray-600 text-lg">
+                <p className="text-gray-600 dark:text-gray-400 text-lg">
                     Kami mengubah konsep menjadi solusi nyata melalui proses yang terencana dan eksekusi yang kreatif.
                 </p>
 
@@ -43,8 +43,8 @@ export default function CollaborationSection() {
                                 <Image src={point.icons} alt={point.title} width={30} height={30} />
                             </div>
                             <div className="space-y-2">
-                                <h3 className="font-semibold text-gray-800 text-xl">{point.title}</h3>
-                                <p className="text-gray-600 text-lg">{point.description}</p>
+                                <h3 className="font-semibold text-gray-800 text-xl dark:text-white">{point.title}</h3>
+                                <p className="text-gray-600 text-lg dark:text-gray-400">{point.description}</p>
                             </div>
                         </li>
                     ))}

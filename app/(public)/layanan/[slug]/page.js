@@ -126,7 +126,7 @@ export default async function ServiceDetailPage({ params }) {
 
   return (
     <>
-      <section className="relative h-[50vh] flex items-center justify-center text-center text-white">
+      <section className="relative h-[50vh] flex items-center justify-center text-center text-white dark:text-gray-100 dark:bg-gray-900">
         {service.heroImageUrl && (
           <Image fill src={service.heroImageUrl} alt={`Gambar utama untuk ${service.title}`} className="object-cover w-full h-full absolute top-0 right-0" priority/>
         )}

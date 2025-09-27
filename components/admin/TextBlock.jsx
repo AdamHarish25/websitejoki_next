@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 const MenuBar = ({ editor }) => {
     if (!editor) return null;
     return (
-        <div className="border border-gray-300 bg-white rounded-t-md p-2 flex flex-wrap gap-1">
+        <div className="border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-700 rounded-t-md p-2 flex flex-wrap gap-1">
             <button type="button" onClick={() => editor.chain().focus().toggleBold().run()} className="px-2 py-1 rounded hover:bg-gray-200">Bold</button>
             <button type="button" onClick={() => editor.chain().focus().toggleItalic().run()} className="px-2 py-1 rounded hover:bg-gray-200">Italic</button>
             <button type="button" onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} className="px-2 py-1 rounded hover:bg-gray-200">H2</button>

@@ -27,7 +27,7 @@ export default async function BlogPage() {
   const articles = await getArticles();
 
   return (
-    <div className="bg-white dark:bg-gray-900 h-auto">
+    <div className="bg-white dark:bg-gray-900 h-auto text-gray-900 dark:text-gray-100">
       <div className="container mx-auto px-6 py-20">
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-extrabold mb-2">Blog & Artikel</h1>
@@ -35,7 +35,7 @@ export default async function BlogPage() {
         </div>
 
         {articles.length === 0 ? (
-          <p className="text-center text-gray-500">Belum ada artikel yang dipublikasikan.</p>
+          <p className="text-center text-gray-500 dark:text-gray-400">Belum ada artikel yang dipublikasikan.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {articles.map((article) => (

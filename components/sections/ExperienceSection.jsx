@@ -20,10 +20,10 @@ export default function ExperienceSection() {
     return (
         <section id="experience" className="container grid grid-cols-1 my-10 lg:grid-cols-2 place-items-center gap-10 lg:gap-8 p-6 mx-auto">
             <div className="space-y-8 lg:space-y-6 grid place-content-center">
-                <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
+                <h2 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-100">
                     Andalkan Pengalaman, Dapatkan Hasil Terbaik
                 </h2>
-                <p className="text-gray-600 text-lg">
+                <p className="text-gray-600 text-lg dark:text-gray-400">
                     Pengalaman kami adalah jaminan kualitas Anda. Kami berdedikasi untuk memberikan layanan yang tidak hanya memenuhi, tetapi menciptakan standar baru untuk kesuksesan Anda.
                 </p>
 

@@ -57,7 +57,7 @@ export default function ManagePackagesPage() {
     };
 
     return (
-        <div className="bg-gray-800 text-white min-h-screen p-8">
+        <div className="bg-gray-800 dark:bg-gray-900 text-white min-h-screen p-8">
             <div className="max-w-6xl mx-auto">
                 <Link href="/admin" className="text-yellow-400 hover:underline mb-6 block">&larr; Back to Dashboard</Link>
                 <h1 className="text-3xl font-bold mb-8">Manage Pricing Packages</h1>

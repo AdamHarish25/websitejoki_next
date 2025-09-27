@@ -24,7 +24,7 @@ export default function HeroSection() {
           <h1 className="text-4xl lg:text-5xl lg:text-6xl font-bold leading-tight">
             Level up Bisnis Anda dengan <span className="text-green-600">Website, Google Ads, & Aplikasi</span> Sesuai Kebutuhan Anda!
           </h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-gray-600 dark:text-gray-300">
             Kami adalah mitra teknologi yang mengembangkan aplikasi kustom, website, dan SEO untuk membantu brand berkembang dan mencapai tujuan bisnis mereka.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 pt-4">

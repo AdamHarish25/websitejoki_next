@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 const MenuBar = ({ editor }) => {
     if (!editor) return null;
     return (
-        <div className="border border-gray-300 bg-white rounded-t-md p-2 flex flex-wrap gap-1">
+        <div className="border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-700 rounded-t-md p-2 flex flex-wrap gap-1">
             <button type="button" onClick={() => editor.chain().focus().toggleBold().run()} className="px-2 py-1 rounded hover:bg-gray-200">Bold</button>
             <button type="button" onClick={() => editor.chain().focus().toggleItalic().run()} className="px-2 py-1 rounded hover:bg-gray-200">Italic</button>
             <button type="button" onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} className="px-2 py-1 rounded hover:bg-gray-200">H2</button>
@@ -60,12 +60,12 @@ export default function ImageTextBlock({ content, onUpdate }) {
     };
 
     return (
-        <div className="p-4 border border-gray-300 rounded-md bg-white space-y-4">
+        <div className="p-4 border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:border-gray-700 space-y-4">
             <div>
                 <label className="block text-sm font-medium mb-2">Posisi Gambar</label>
                 <div className="flex gap-2">
-                    <button type="button" onClick={() => handlePositionChange('left')} className={`px-3 py-1 rounded text-sm ${content.imagePosition === 'left' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}>Kiri</button>
-                    <button type="button" onClick={() => handlePositionChange('right')} className={`px-3 py-1 rounded text-sm ${content.imagePosition === 'right' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}>Kanan</button>
+                    <button type="button" onClick={() => handlePositionChange('left')} className={`px-3 py-1 rounded text-sm ${content.imagePosition === 'left' ? 'bg-blue-600 dark:bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700'}`}>Kiri</button>
+                    <button type="button" onClick={() => handlePositionChange('right')} className={`px-3 py-1 rounded text-sm ${content.imagePosition === 'right' ? 'bg-blue-600 dark:bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700'}`}>Kanan</button>
                 </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

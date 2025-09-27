@@ -4,10 +4,9 @@ import Link from 'next/link';
 export default function Footer() {
     // Data untuk social media links agar mudah dikelola
     const socialLinks = [
-        { name: 'Instagram', icon: <Instagram size={20} />, href: "#" },
-        { name: 'Dribbble', icon: <Dribbble size={20} />, href: "#" },
-        { name: 'Linkedin', icon: <Linkedin size={20} />, href: "#" },
-        { name: 'Facebook', icon: <Facebook size={20} />, href: "#" },
+        { name: 'Instagram', icon: <Instagram size={20} />, href: "https://www.instagram.com/webjoki.id/" },
+        { name: 'Dribbble', icon: <Dribbble size={20} />, href: "https://dribbble.com/websitejokiid" },
+        { name: 'Linkedin', icon: <Linkedin size={20} />, href: "https://www.linkedin.com/in/adam-abdurrahman/" },
     ];
 
   return (

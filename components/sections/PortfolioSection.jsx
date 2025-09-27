@@ -1,7 +1,12 @@
+"use client";
+
 import Image from 'next/image';
 import Link from 'next/link';
+import { useState } from 'react';
 
 export default function PortfolioSection() {
+    const [expanded, setExpanded] = useState(false);
+
     // Anda bisa mengganti data ini dengan data dari database/CMS nanti
     const projects = [
         {
@@ -32,7 +37,24 @@ export default function PortfolioSection() {
             alt: "Mockup halaman penawaran spesial untuk produk fashion",
             link: "https://sinefolis-movies.netlify.app/"
         },
+        {
+            title: "Terapi Tumbuh Kembang - Klinik Terapi Anak",
+            image: "/portfolio/TerapiChaira.png", // Ganti dengan path gambar Anda
+            logo: "/portfolio/logo/terapiChaira.png", // Ganti dengan path logo Anda
+            alt: "Mockup website klinik terapi tumbuh kembang anak",
+            link: "https://terapitumbuhkembangchaira.com/"
+        },
+        {
+            title: "Finplay-Edu - Platform Edukasi Keuangan",
+            image: "/portfolio/finplay-edu.png", // Ganti dengan path gambar Anda
+            logo: "/portfolio/logo/finplay-eduLogo.png", // Ganti dengan path logo Anda
+            alt: "Mockup landing page edukasi keuangan Finplay Edu",
+            link: "https://finplay-edu.netlify.app/"
+        }
     ];
+
+
+    const visibleProjects = expanded ? projects : projects.slice(0, 4);
 
     return (
         <section id="portfolio" className="py-20 bg-[#2ECC71]/15">
@@ -47,7 +69,7 @@ export default function PortfolioSection() {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {projects.map((project) => (
+                    {visibleProjects.map((project) => (
                         <Link key={project.title} href={project.link} className="block group">
                             <div className="relative overflow-hidden rounded-lg shadow-lg aspect-video bg-white">
                                 {/* Gambar Utama Proyek */}
@@ -65,7 +87,7 @@ export default function PortfolioSection() {
                                         <Image
                                             src={project.logo}
                                             alt={`${project.title} Logo`}
-                                            
+
                                             width={124}
                                             height={124}
                                         />
@@ -79,6 +101,31 @@ export default function PortfolioSection() {
                         </Link>
                     ))}
                 </div>
+
+                {projects.length > 4 && (
+                    <div className="flex justify-center mt-8">
+                        <button
+                            onClick={() => setExpanded(!expanded)}
+                            className="flex items-center px-4 py-2 bg-[#2ECC71] text-white rounded-full shadow hover:bg-[#27ae60] transition"
+                        >
+                            {expanded ? (
+                                <>
+                                    Sembunyikan
+                                    <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+                                    </svg>
+                                </>
+                            ) : (
+                                <>
+                                    Lihat Semua
+                                    <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </>
+                            )}
+                        </button>
+                    </div>
+                )}
             </div>
         </section>
     );

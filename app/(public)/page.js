@@ -12,7 +12,7 @@ import FloatingWhatsApp from '@/components/shared/floatingWAButton';
 export default function HomePage() {
 
   return (
-    <>
+    <main className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
       <HeroSection />
       <AnimatedSection><StatsSection /></AnimatedSection>
       <AnimatedSection><ServicesSection /></AnimatedSection>
@@ -22,7 +22,7 @@ export default function HomePage() {
       <AnimatedSection><FaqSection /></AnimatedSection>
       <AnimatedSection><CtaSection /></AnimatedSection>
       <FloatingWhatsApp />
-    </>
+    </main>
   );
 }
 

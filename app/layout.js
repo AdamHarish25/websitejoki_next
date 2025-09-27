@@ -34,7 +34,7 @@ export default function RootLayout({ children }) {
         }}
       />
       
-      <body className={`${inter.className} bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100`}>
+  <body className={`${inter.className} bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100`}>
         {/* Navbar dan Footer akan dirender di sini oleh layout lain atau page */}
         {children}
       </body>

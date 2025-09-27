@@ -103,7 +103,7 @@ export default async function ArticlePage({ params }) {
   const { headings, modifiedContent } = extractHeadings(article.content);
 
   return (
-    <article className="bg-white dark:bg-gray-900">
+    <article className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       <div className="container mx-auto px-4 md:px-8 max-w-4xl py-16">
         <header className="mb-12">
           <h1 className="text-3xl md:text-5xl font-extrabold mb-4 leading-tight">{article.title}</h1>

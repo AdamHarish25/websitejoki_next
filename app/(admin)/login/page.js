@@ -36,7 +36,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50 relative">
+    <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 relative">
       <Link href={'/'} className='absolute top-3 left-3 text-underline flex items-center gap-5 transition-transform hover:scale-96 hover:underline'>
         <FaArrowCircleLeft/> Kembali ke beranda
       </Link>

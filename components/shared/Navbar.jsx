@@ -39,7 +39,7 @@ export default function Navbar() {
 
 
   return (
-    <header className="bg-white/80 backdrop-blur-sm sticky top-0 z-50 border-b border-gray-200/80">
+    <header className="bg-white/80 dark:bg-gray-800 dark:bg-opacity-80 backdrop-blur-sm sticky top-0 z-50 border-b dark:border-0 border-gray-200/80">
       {/* Kontainer utama nav dengan flexbox */}
       <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
 
@@ -53,7 +53,7 @@ export default function Navbar() {
         {/* Navigasi Desktop */}
         <div className="hidden lg:flex items-center space-x-8">
           {navLinks.map((link) => (
-            <RefreshingLink key={link.name} href={link.href} className="text-gray-600 hover:text-green-600 capitalize">
+            <RefreshingLink key={link.name} href={link.href} className="text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors duration-300capitalize">
               {link.name}
             </RefreshingLink>
           ))}

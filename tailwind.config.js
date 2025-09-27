@@ -5,6 +5,8 @@ module.exports = {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+
+  darkMode : 'class', // atau 'media' jika ingin otomatis
   theme: {
     extend: {},
   },

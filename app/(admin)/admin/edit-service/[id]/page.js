@@ -175,23 +175,23 @@ export default function EditServicePage() {
     // Kecuali memanggil fungsi handler yang benar
     if (user) {
         return (
-            <div className="bg-white text-black min-h-screen p-8">
+            <div className="bg-white text-black dark:bg-gray-900 dark:text-gray-100 min-h-screen p-8">
                 <div className="max-w-4xl mx-auto">
-                    <Link href="/admin" className="text-blue-600 hover:underline mb-6 block">← Back to Dashboard</Link>
+                    <Link href="/admin" className="text-blue-600 dark:text-white hover:underline mb-6 block">← Back to Dashboard</Link>
                     <h1 className="text-3xl font-bold mb-8">Edit Service</h1>
                     <form onSubmit={handleSubmit} className="space-y-8">
                         <div className="p-6 bg-[#2ECC71]/10 rounded-lg space-y-4">
                             <div>
                                 <label className="block text-lg font-medium mb-1">Judul Layanan</label>
-                                <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required className="w-full p-2 border border-gray-300 rounded-md bg-[#2ECC71]/15 text-black" />
+                                <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required className="w-full p-2 border border-gray-300 rounded-md bg-[#2ECC71]/15 text-black dark:text-gray-100" />
                             </div>
                             <div>
                                 <label className="block text-lg font-medium mb-1">Slug (URL)</label>
-                                <input type="text" value={slug} onChange={(e) => setSlug(e.target.value)} required className="w-full p-2 border border-gray-300 rounded-md bg-[#2ECC71]/15 text-black" />
+                                <input type="text" value={slug} onChange={(e) => setSlug(e.target.value)} required className="w-full p-2 border border-gray-300 rounded-md bg-[#2ECC71]/15 text-black dark:text-gray-100" />
                             </div>
                             <div>
                                 <label className="block text-lg font-medium mb-1">Kategori Harga</label>
-                                <select value={pricingCategory} onChange={(e) => setPricingCategory(e.target.value)} required className="w-full p-2 border border-gray-300 rounded-md bg-[#2ECC71]/15 text-black">
+                                <select value={pricingCategory} onChange={(e) => setPricingCategory(e.target.value)} required className="w-full p-2 border border-gray-300 rounded-md bg-[#2ECC71]/15 text-black dark:text-gray-100">
                                     <option value="seo">Jasa SEO</option>
                                     <option value="ads">Jasa Ads</option>
                                     <option value="web-design">Jasa Web Design</option>
@@ -202,7 +202,7 @@ export default function EditServicePage() {
                             </div>
                             <div>
                                 <label className="block text-lg font-medium mb-1">Deskripsi Singkat</label>
-                                <textarea value={shortDescription} onChange={(e) => setShortDescription(e.target.value)} rows={3} required className="w-full p-2 border border-gray-300 rounded-md bg-[#2ECC71]/15 text-black" />
+                                <textarea value={shortDescription} onChange={(e) => setShortDescription(e.target.value)} rows={3} required className="w-full p-2 border border-gray-300 rounded-md bg-[#2ECC71]/15 text-black dark:text-gray-100" />
                             </div>
                             <div>
                                 <label className="block text-lg font-medium mb-1">Ganti Gambar Utama (Opsional)</label>
@@ -214,7 +214,7 @@ export default function EditServicePage() {
                                 <div className="space-y-2">
                                     {features.map((feature, index) => (
                                         <div key={index} className="flex items-center gap-2">
-                                            <input type="text" value={feature} onChange={(e) => handleFeatureChange(index, e.target.value)} className="w-full p-2 border border-gray-300 rounded-md bg-[#2ECC71]/15 text-black" placeholder={`Fitur #${index + 1}`} />
+                                            <input type="text" value={feature} onChange={(e) => handleFeatureChange(index, e.target.value)} className="w-full p-2 border border-gray-300 rounded-md bg-[#2ECC71]/15 text-black dark:text-gray-100" placeholder={`Fitur #${index + 1}`} />
                                             <button type="button" onClick={() => removeFeature(index)} className="bg-red-600 text-white px-3 py-2 rounded-md">×</button>
                                         </div>
                                     ))}
@@ -246,7 +246,7 @@ export default function EditServicePage() {
                                 </div>
                             </div>
                         </div>
-                        <button type="submit" disabled={isLoading} className="w-full px-6 py-4 bg-yellow-500 text-black font-bold rounded-md text-lg hover:bg-yellow-600 disabled:bg-gray-500">
+                        <button type="submit" disabled={isLoading} className="w-full px-6 py-4 bg-blue-500 text-white font-bold rounded-md text-lg hover:bg-blue-600 disabled:bg-gray-500">
                             {isLoading ? 'Menyimpan Perubahan...' : 'Update Layanan'}
                         </button>
                     </form>

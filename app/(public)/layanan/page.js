@@ -52,8 +52,7 @@ export default async function ServicesPage() {
     };
   });
   return (
-    <div className='w-full h-fit rounded-xl'>
-
+    <div className='w-full h-fit rounded-xl bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100'>
 
       <div className="container h-full mx-auto px-6 py-16 rounded-xl">
         <h1 className="text-4xl font-bold text-center mb-12">Layanan Digital Kami</h1>
@@ -67,7 +66,7 @@ export default async function ServicesPage() {
                     // Gunakan properti 'banner' yang baru kita tambahkan
                     src={service.banner}
                     alt={`Ikon untuk layanan ${service.title}`}
-                    className="object-cover w-full h-full rounded-xl group-hover:scale-105 transition-transform duration-300"
+                    className="object-cover w-full h-full rounded-xl group-hover:scale-105 transition-transform duration-300 dark:bg-white"
                     width={500}
                     height={300}
                     priority

@@ -49,7 +49,7 @@ export default function CreateArticlePage() {
         immediatelyRender: false,
         editorProps: {
             attributes: {
-                class: 'prose max-w-none p-4 border-b border-x border-white bg-[#2ECC71]/50 text-black rounded-b-md min-h-[300px] focus:outline-none',
+                class: 'prose max-w-none p-4 border-b border-x border-white bg-[#2ECC71]/50 text-black dark:text-gray-100 rounded-b-md min-h-[300px] focus:outline-none',
             },
         },
     });
@@ -112,18 +112,18 @@ export default function CreateArticlePage() {
 
     if (user) {
         return (
-            <div className="bg-white text-black min-h-screen p-8">
+            <div className="bg-white dark:bg-gray-900 text-black dark:text-gray-100 min-h-screen p-8">
                 <div className="max-w-4xl mx-auto">
-                    <Link href="/admin" className="text-yellow-400 hover:underline mb-6 block">&larr; Back to Dashboard</Link>
+                    <Link href="/admin" className="text-blue-600 dark:text-white hover:underline mb-6 block">&larr; Back to Dashboard</Link>
                     <h1 className="text-3xl font-bold mb-8">Create New Article</h1>
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div>
                             <label className="block text-lg font-medium mb-1">Judul Artikel</label>
-                            <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required className="w-full p-2 border border-white rounded-md bg-[#2ECC71]/50 text-black focus:ring-yellow-400 focus:border-yellow-400" />
+                            <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required className="w-full p-2 border border-white rounded-md bg-[#2ECC71]/50 text-black dark:text-gray-100 focus:ring-yellow-400 focus:border-yellow-400" />
                         </div>
                         <div>
                             <label className="block text-lg font-medium mb-1">Slug (URL)</label>
-                            <input type="text" value={slug} onChange={handleSlugChange} required className="w-full p-2 border border-white rounded-md bg-[#2ECC71]/50 text-black focus:ring-yellow-400 focus:border-yellow-400" />
+                            <input type="text" value={slug} onChange={handleSlugChange} required className="w-full p-2 border border-white rounded-md bg-[#2ECC71]/50 text-black dark:text-gray-100 focus:ring-yellow-400 focus:border-yellow-400" />
                             <p className="text-sm text-gray-400 mt-1">URL akan menjadi: `.../blog/{slug}`</p>
                         </div>
 
@@ -135,7 +135,7 @@ export default function CreateArticlePage() {
                                 rows={3}
                                 maxLength={160}
                                 required
-                                className="w-full p-2 border border-gray-300 rounded-md bg-[#2ECC71]/50 text-black focus:ring-yellow-400 focus:border-yellow-400"
+                                className="w-full p-2 border border-gray-300 rounded-md bg-[#2ECC71]/50 text-black dark:text-gray-100 focus:ring-yellow-400 focus:border-yellow-400"
                             />
                             <p className="text-sm text-right">{metaDescription.length} / 160</p>
                         </div>
