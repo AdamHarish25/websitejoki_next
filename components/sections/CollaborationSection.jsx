@@ -20,7 +20,7 @@ export default function CollaborationSection() {
         <section id="kolaborasi" className="container grid grid-cols-1 lg:grid-cols-2 place-items-center gap-10 lg:gap-8 p-6 mx-auto">
             <div className="relative lg:w-full">
                 <Image
-                    src="/Collaborate.png"
+                    src="/Collaborate.jpg"
                     alt="Kolaborasi"
                     width={600}
                     height={600}
@@ -36,7 +36,7 @@ export default function CollaborationSection() {
                     Kami mengubah konsep menjadi solusi nyata melalui proses yang terencana dan eksekusi yang kreatif.
                 </p>
 
-                <ul className="space-y-4">
+                <ul className="space-y-4 pl-0 list-none w-full">
                     {points.map((point, index) => (
                         <li key={index} className="flex flex-col lg:flex-row items-start space-y-6 lg:space-x-6 bg-[#2ECC71]/15 p-6 rounded-lg shadow-md transition-transform hover:-translate-y-1">
                             <div className="h-10 w-20 bg-[#2ECC71] text-white flex items-center justify-center rounded-md">

@@ -39,7 +39,7 @@ export default function ExperienceSection() {
 
             <div className="relative">
                 <Image
-                    src="/experience.png"
+                    src="/experience.jpg"
                     alt="experiences"
                     width={600}
                     height={600}

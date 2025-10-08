@@ -40,7 +40,7 @@ export default function HeroSection() {
           </div>
         </div>
         <div className="relative w-full h-fit rounded-xl overflow-hidden shadow-2xl">
-          <CustomVideoPlayer src="/video/hero_video.mp4" thumbnailSrc={'/hero/thumbnail2.png'} />
+          <CustomVideoPlayer src="/video/hero_video.mp4" thumbnailSrc={'/hero/thumbnail2.jpg'} />
         </div>
       </div>
     </section>

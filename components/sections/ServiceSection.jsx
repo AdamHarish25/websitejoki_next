@@ -4,12 +4,12 @@ export default function ServicesSection() {
   // Data layanan bisa diletakkan di sini atau diambil dari CMS
 
   const services = [
-    { title: "Aplikasi Mobile", description: "Tingkatkan loyalitas pelanggan...", image: "/services/AppMob.svg", alt: "Mockup aplikasi mobile" },
-    { title: "Hak Merk", description: "Tingkatkan loyalitas pelanggan...", image: "/services/HakMerk.svg", alt: "Mockup hak merk" },
-    { title: "Website", description: "Ubah pengunjung menjadi pelanggan...", image: "/services/Web.svg", alt: "Mockup website profesional" },
-    { title: "Dashboard", description: "Ambil keputusan bisnis lebih cerdas...", image: "/services/Dashboard.svg", alt: "Mockup dashboard analitik" },
-    { title: "Advertising Online", description: "Dapatkan pelanggan berkualitas secara instan...", image: "/services/Ads.svg", alt: "Iklan Google di halaman pencarian" },
-    { title: "Artikel SEO", description: "Dominasi peringkat Google dan bangun kepercayaan...", image: "/services/SEO.svg", alt: "Contoh hasil artikel SEO" },
+    { title: "Aplikasi Mobile", description: "Tingkatkan loyalitas pelanggan...", image: "/services/AppMob.png", alt: "Mockup aplikasi mobile" },
+    { title: "Hak Merk", description: "Tingkatkan loyalitas pelanggan...", image: "/services/HakMerk.png", alt: "Mockup hak merk" },
+    { title: "Website", description: "Ubah pengunjung menjadi pelanggan...", image: "/services/Web.png", alt: "Mockup website profesional" },
+    { title: "Dashboard", description: "Ambil keputusan bisnis lebih cerdas...", image: "/services/Dashboard.png", alt: "Mockup dashboard analitik" },
+    { title: "Advertising Online", description: "Dapatkan pelanggan berkualitas secara instan...", image: "/services/Ads.png", alt: "Iklan Google di halaman pencarian" },
+    { title: "Artikel SEO", description: "Dominasi peringkat Google dan bangun kepercayaan...", image: "/services/SEO.png", alt: "Contoh hasil artikel SEO" },
   ];
 
   return (
