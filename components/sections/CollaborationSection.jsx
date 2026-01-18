@@ -1,18 +1,21 @@
+'use client';
 import { icons } from "lucide-react";
 import Image from "next/image";
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function CollaborationSection() {
+    const { t } = useLanguage();
     const points = [
         {
             icons: "/icons/gear.svg",
-            title: "Perencanaan Terstruktur",
-            description: "Setiap proyek kami mulai dengan riset dan strategi yang matang untuk memastikan hasil yang terukur dan sesuai target."
+            title: t('collaboration.points.planning.title'),
+            description: t('collaboration.points.planning.description')
         },
 
         {
             icons: "/icons/star.svg",
-            title: "Hasil Kreatif Nyata",
-            description: "Kami tidak hanya membuat desain yang indah, tapi juga solusi fungsional yang benar-benar bekerja dan memberikan nilai."
+            title: t('collaboration.points.creative.title'),
+            description: t('collaboration.points.creative.description')
         }
     ]
 
@@ -30,10 +33,10 @@ export default function CollaborationSection() {
 
             <div className="space-y-8 lg:space-y-4 grid place-content-end w-full p-0">
                 <h2 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">
-                    Partner Kolaborasi Kreatif Anda
+                    {t('collaboration.title')}
                 </h2>
                 <p className="text-gray-600 dark:text-gray-400 text-lg">
-                    Kami mengubah konsep menjadi solusi nyata melalui proses yang terencana dan eksekusi yang kreatif.
+                    {t('collaboration.description')}
                 </p>
 
                 <ul className="space-y-4 pl-0 list-none w-full">

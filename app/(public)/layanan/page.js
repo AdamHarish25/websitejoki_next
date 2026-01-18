@@ -1,7 +1,6 @@
 import { db } from '@/lib/firebaseConfig';
 import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
-import Image from 'next/image';
-import Link from 'next/link';
+import ServicesClientPage from './ServicesClientPage';
 
 async function getServices() {
   const q = query(collection(db, 'services'), where("published", "==", true), orderBy('createdAt', 'desc'));
@@ -17,25 +16,46 @@ export const metadata = {
 const dataBanner = [
   {
     category: 'app',
-    banner: './services/AppMob.svg',
+    banner: {
+      id: '/services/AppMob.svg',
+      en: '/services/AppMob.svg' // Ganti path ini jika sudah ada poster versi EN
+    }
   },
   {
     category: 'web',
-    banner: './services/Web.svg',
+    banner: {
+      id: '/services/Web.svg',
+      en: '/services/Web.svg' // Ganti path ini jika sudah ada poster versi EN
+    }
   },
   {
     category: 'dash',
-    banner: './services/Dashboard.svg',
+    banner: {
+      id: '/services/Dashboard.svg',
+      en: '/services/Dashboard.svg' // Ganti path ini jika sudah ada poster versi EN
+    }
   },
   {
     category: 'ads',
-    banner: './services/Ads.svg',
+    banner: {
+      id: '/services/Ads.svg',
+      en: '/services/Ads.svg' // Ganti path ini jika sudah ada poster versi EN
+    }
   },
   {
     category: 'seo',
-    banner: './services/SEO.svg',
+    banner: {
+      id: '/services/SEO.svg',
+      en: '/services/SEO.svg' // Ganti path ini jika sudah ada poster versi EN
+    }
   },
-  { category: 'brand', banner: './services/HakMerk.svg' }
+  {
+    category: 'brand',
+    banner: {
+      id: '/services/HakMerk.svg',
+      en: '/services/HakMerk.svg' // Ganti path ini jika sudah ada poster versi EN
+    }
+  }
 ]
 
 export default async function ServicesPage() {
@@ -44,46 +64,18 @@ export default async function ServicesPage() {
   const services = servicesFromDb.map(service => {
     // Cari banner yang cocok berdasarkan 'pricingCategory' dari service
     const bannerData = dataBanner.find(banner => banner.category === service.pricingCategory);
+
+    // Siapkan object banner dengan fail-safe
+    const bannerObj = bannerData ? bannerData.banner : { id: '/placeholder.jpg', en: '/placeholder.jpg' };
+
     return {
       ...service,
-      // Tambahkan properti 'banner' ke setiap service.
-      // Jika tidak ketemu, beri gambar placeholder.
-      banner: bannerData ? bannerData.banner : '/placeholder.jpg' 
+      // Pass banner as an object { id, en }
+      banner: bannerObj
     };
   });
-  return (
-    <div className='w-full h-fit rounded-xl bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100'>
 
-      <div className="container h-full mx-auto px-6 py-16 rounded-xl">
-        <h1 className="text-4xl font-bold text-center mb-12">Layanan Digital Kami</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 h-full gap-8">
-          {services.map((service) => (
-            <Link key={service.id} href={`/layanan/${service.slug}`} className="block group">
-              <div className="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 h-fit flex flex-col">
-                {/* Bagian Gambar/Banner */}
-                <div className="relative w-full h-fit bg-[#2ECC71]/10 dark:bg-gray-800 flex items-center justify-center p-3">
-                  <Image
-                    // Gunakan properti 'banner' yang baru kita tambahkan
-                    src={service.banner}
-                    alt={`Ikon untuk layanan ${service.title}`}
-                    className="object-cover w-full h-full rounded-xl group-hover:scale-105 transition-transform duration-300 dark:bg-white"
-                    width={500}
-                    height={300}
-                    priority
-                  />
-                </div>
-                {/* Bagian Teks */}
-                {/* <div className="p-6 flex flex-col flex-grow bg-white dark:bg-gray-800">
-                  <h2 className="text-xl font-bold mb-3 text-green-600 group-hover:underline">{service.title}</h2>
-                  <p className="text-gray-600 dark:text-gray-300 line-clamp-3">
-                    {service.shortDescription}
-                  </p>
-                </div> */}
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
-    </div>
+  return (
+    <ServicesClientPage services={services} />
   );
 }

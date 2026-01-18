@@ -3,52 +3,54 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function PortfolioSection() {
+    const { t } = useLanguage();
     const [expanded, setExpanded] = useState(false);
 
     // Anda bisa mengganti data ini dengan data dari database/CMS nanti
     const projects = [
         {
-            title: "Ada Loker - Dashboard Pencarian Kerja",
+            title: t('portfolio.projects.adaloker.title'),
             image: "/portfolio/Adaloker.png", // Ganti dengan path gambar Anda
             logo: "/portfolio/logo/Adaloker.svg", // Ganti dengan path logo Anda
-            alt: "Mockup dashboard website pencarian kerja berwarna gelap",
+            alt: t('portfolio.projects.adaloker.alt'),
             link: "https://adaloker.netlify.app/"
         },
         {
-            title: "TobaLawfirm - Layanan Hukum Terpercaya",
+            title: t('portfolio.projects.tobalaw.title'),
             image: "/portfolio/TobalawFirm.png", // Ganti dengan path gambar Anda
             logo: "/portfolio/logo/tobalaw.jpg", // Ganti dengan path logo Anda
-            alt: "Mockup sistem informasi hotel menampilkan daftar kamar",
+            alt: t('portfolio.projects.tobalaw.alt'),
             link: "https://tobalaw.com"
         },
         {
-            title: "BeeJoys - Travel Landing Page",
+            title: t('portfolio.projects.beejoys.title'),
             image: "/portfolio/Beejoys.png", // Ganti dengan path gambar Anda
             logo: "/portfolio/logo/BeeJoys.svg", // Ganti dengan path logo Anda
-            alt: "Mockup landing page untuk agen travel BeeJoys",
+            alt: t('portfolio.projects.beejoys.alt'),
             link: "https://beejoystravel.netlify.app/"
         },
         {
-            title: "Sinefolis - Platform Booking Sinema Terbaik",
+            title: t('portfolio.projects.sinefolis.title'),
             image: "/portfolio/Sinefolis.png", // Ganti dengan path gambar Anda
             logo: "/portfolio/logo/Sinefolis.svg", // Ganti dengan path logo Anda
-            alt: "Mockup halaman penawaran spesial untuk produk fashion",
+            alt: t('portfolio.projects.sinefolis.alt'),
             link: "https://sinefolis-movies.netlify.app/"
         },
         {
-            title: "Terapi Tumbuh Kembang - Klinik Terapi Anak",
+            title: t('portfolio.projects.terapi.title'),
             image: "/portfolio/TerapiChaira.png", // Ganti dengan path gambar Anda
             logo: "/portfolio/logo/terapiChaira.png", // Ganti dengan path logo Anda
-            alt: "Mockup website klinik terapi tumbuh kembang anak",
+            alt: t('portfolio.projects.terapi.alt'),
             link: "https://terapitumbuhkembangchaira.com/"
         },
         {
-            title: "Finplay-Edu - Platform Edukasi Keuangan",
+            title: t('portfolio.projects.finplay.title'),
             image: "/portfolio/finplay-edu.png", // Ganti dengan path gambar Anda
             logo: "/portfolio/logo/finplay-eduLogo.png", // Ganti dengan path logo Anda
-            alt: "Mockup landing page edukasi keuangan Finplay Edu",
+            alt: t('portfolio.projects.finplay.alt'),
             link: "https://finplay-edu.netlify.app/"
         }
     ];
@@ -61,10 +63,10 @@ export default function PortfolioSection() {
             <div className="container mx-auto px-6">
                 <div className="text-center md:text-left mb-12">
                     <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                        Cek Project Terbaru Kami
+                        {t('portfolio.title')}
                     </h2>
                     <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto md:mx-0">
-                        Berikut adalah beberapa karya terbaik kami, menunjukkan keahlian dalam memberikan solusi digital yang inovatif dan efektif.
+                        {t('portfolio.description')}
                     </p>
                 </div>
 
@@ -110,14 +112,14 @@ export default function PortfolioSection() {
                         >
                             {expanded ? (
                                 <>
-                                    Sembunyikan
+                                    {t('portfolio.buttons.show_less')}
                                     <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
                                     </svg>
                                 </>
                             ) : (
                                 <>
-                                    Lihat Semua
+                                    {t('portfolio.buttons.show_all')}
                                     <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                                     </svg>
