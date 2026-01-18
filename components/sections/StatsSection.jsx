@@ -1,3 +1,5 @@
+'use client';
+
 import { Users, Clock, Star } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 
