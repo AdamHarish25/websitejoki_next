@@ -8,27 +8,56 @@ export async function POST(request) {
             return NextResponse.json({ error: 'Text is required' }, { status: 400 });
         }
 
-        // Google Translate GTX endpoint (Free, rate-limited, unofficial)
-        // For production enterprise use, User should use Google Cloud Translation API with API Key.
-        // This is a robust fallback for "free" usage in this context.
-        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang}&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
+        // Use POST to avoid URL length limits with large content
+        // MOVE sl and tl to URL, keep q in body
+        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang}&tl=${targetLang}&dt=t`;
 
-        const response = await fetch(url);
+        console.log(`[Translate API] Translating ${text.length} chars from ${sourceLang} to ${targetLang}`);
+
+        const formData = new URLSearchParams();
+        formData.append('q', text);
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            },
+            body: formData.toString()
+        });
+
+        console.log(`[Translate API] Upstream status: ${response.status}`);
+
         if (!response.ok) {
-            throw new Error('Translation service failed');
+            const errorText = await response.text();
+            console.error('Upstream Translation Error:', response.status, errorText);
+            throw new Error(`Translation service failed with status ${response.status}`);
         }
 
         const data = await response.json();
 
-        // GTX returns an nested array. 
-        // data[0] contains the translated segments.
-        // map over them and join the translated text parts.
-        const translatedText = data[0].map(item => item[0]).join('');
+        // Safe parsing of the nested array response
+        // Format is typically: [[["translated", "source", ...], ...], ...]
+        if (!data || !Array.isArray(data) || !data[0]) {
+            // Sometimes it returns just the array if simple? No, usually nested.
+            // If Google blocks, it returns HTML (caught by response.ok check above usually, but maybe 200 OK with captcha?)
+            console.error("Invalid Structure:", JSON.stringify(data).substring(0, 200));
+            throw new Error('Unexpected response format from translation service');
+        }
+
+        const paragraphs = data[0];
+        if (!Array.isArray(paragraphs)) {
+            throw new Error('Unexpected paragraph format');
+        }
+
+        const translatedText = paragraphs
+            .map(item => (Array.isArray(item) && item[0]) ? item[0] : '')
+            .join('');
 
         return NextResponse.json({ translatedText });
 
     } catch (error) {
-        console.error('Translation error:', error);
-        return NextResponse.json({ error: 'Failed to translate' }, { status: 500 });
+        console.error('Translation API error:', error);
+        return NextResponse.json({ error: 'Failed to translate', details: error.message }, { status: 500 });
     }
 }

@@ -17,6 +17,7 @@ async function getArticles() {
       createdAt: data.createdAt.toDate().toLocaleDateString('id-ID', {
         day: 'numeric', month: 'long', year: 'numeric'
       }),
+      updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate().toISOString() : null,
     }
   });
   return articleList;

@@ -5,7 +5,16 @@ import ServicesClientPage from './ServicesClientPage';
 async function getServices() {
   const q = query(collection(db, 'services'), where("published", "==", true), orderBy('createdAt', 'desc'));
   const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  return snapshot.docs.map(doc => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      ...data,
+      // Serialize Firestore Timestamps to strings
+      createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : data.createdAt,
+      updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate().toISOString() : data.updatedAt,
+    };
+  });
 }
 
 export const metadata = {

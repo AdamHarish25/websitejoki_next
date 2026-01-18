@@ -37,9 +37,10 @@ async function getArticle(slug) {
 
   return {
     ...articleData,
-    createdAt: articleData.createdAt.toDate().toLocaleDateString('id-ID', {
+    createdAt: articleData.createdAt?.toDate ? articleData.createdAt.toDate().toLocaleDateString('id-ID', {
       day: 'numeric', month: 'long', year: 'numeric'
-    }),
+    }) : articleData.createdAt,
+    updatedAt: articleData.updatedAt?.toDate ? articleData.updatedAt.toDate().toISOString() : null,
   };
 }
 

@@ -7,7 +7,7 @@ import Image from 'next/image';
 import TableOfContents from '@/components/blog/tableofcontents';
 import { useLanguage } from '@/context/LanguageContext';
 import { useMemo } from 'react';
-import { Calendar, User, Clock, Share2 } from 'lucide-react';
+import { Share2 } from 'lucide-react';
 
 // Note: We use Regex here to avoid using JSDOM (which is Node.js only) in a Client Component.
 function extractHeadings(contentHTML) {
@@ -83,7 +83,7 @@ export default function ArticleClientPage({ article }) {
                                 {/* <span className='text-green-600 dark:text-green-400 text-xs px-2 py-0.5 bg-green-50 dark:bg-green-900/30 rounded-full'>Follow</span> */}
                             </p>
                             <div className="flex items-center gap-3 text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                <span>{new Date(article.createdAt?.seconds * 1000 || Date.now()).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                                <span>{article.createdAt}</span>
                                 <span>•</span>
                                 <span>{readTime} min read</span>
                             </div>

@@ -124,14 +124,27 @@ export default function EditArticlePage() {
     // Translation Handler
     const handleTranslate = async (sourceText, setTargetFunc, setLoadingFunc, isHtml = false) => {
         if (!sourceText) return;
+
+        // Simple length check warning
+        if (sourceText.length > 5000) {
+            const proceed = confirm("Teks cukup panjang (>5000 karakter). Terjemahan mungkin gagal atau tidak lengkap. Lanjutkan?");
+            if (!proceed) return;
+        }
+
         setLoadingFunc(true);
         try {
             const res = await fetch('/api/translate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text: sourceText, sourceLang: 'id', targetLang: 'en' }),
+                body: JSON.stringify({ text: sourceText, sourceLang: 'auto', targetLang: 'en' }),
             });
+
             const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error || `Server error: ${res.status}`);
+            }
+
             if (data.translatedText) {
                 if (isHtml && editorEn) {
                     editorEn.commands.setContent(data.translatedText);
@@ -139,11 +152,11 @@ export default function EditArticlePage() {
                     setTargetFunc(data.translatedText);
                 }
             } else {
-                console.error("Translation returned empty");
+                throw new Error("Empty translation received");
             }
         } catch (error) {
-            console.error("Translation failed", error);
-            alert("Gagal menerjemahkan otomatis. Coba lagi.");
+            console.error("Translation failed:", error);
+            alert(`Gagal menerjemahkan: ${error.message}`);
         } finally {
             setLoadingFunc(false);
         }
