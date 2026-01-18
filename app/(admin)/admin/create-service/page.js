@@ -1,72 +1,155 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebaseConfig';
-
-// Impor komponen Blok
+import { Loader2, ArrowLeft, Sparkles, ImagePlus, FileText, Globe, Box, Layout, Plus, Trash2 } from 'lucide-react';
 import TextBlock from '@/components/admin/TextBlock';
 import ImageTextBlock from '@/components/admin/ImageTextBlock';
+
+// Reuse SectionCard
+const SectionCard = ({ title, icon: Icon, children, className = "" }) => (
+    <div className={`bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden ${className}`}>
+        <div className="bg-gray-50 dark:bg-gray-900/50 px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center gap-3">
+            {Icon && <Icon className="w-5 h-5 text-[#2ECC71]" />}
+            <h3 className="font-bold text-gray-800 dark:text-gray-100 text-lg">{title}</h3>
+        </div>
+        <div className="p-6">
+            {children}
+        </div>
+    </div>
+);
 
 export default function CreateServicePage() {
     const [user, loading] = useAuthState(auth);
     const router = useRouter();
+    const [isMounted, setIsMounted] = useState(false);
 
-    // State untuk data layanan baru
+    // ID States
     const [title, setTitle] = useState('');
     const [slug, setSlug] = useState('');
     const [shortDescription, setShortDescription] = useState('');
+    const [features, setFeatures] = useState(['']); // Array of strings
+
+    // EN States
+    const [titleEn, setTitleEn] = useState('');
+    const [shortDescriptionEn, setShortDescriptionEn] = useState('');
+    const [featuresEn, setFeaturesEn] = useState(['']); // Array of strings
+
+    // Metadata & Content
     const [pricingCategory, setPricingCategory] = useState('seo');
     const [heroImage, setHeroImage] = useState(null);
-    const [features, setFeatures] = useState(['']);
     const [pageContent, setPageContent] = useState([]);
-    
+
     const [isLoading, setIsLoading] = useState(false);
 
-    // Fungsi untuk mengelola input fitur (logika tidak berubah)
-    const handleFeatureChange = (index, value) => {
-        const newFeatures = [...features];
+    // Translation Loading
+    const [isTranslating, setIsTranslating] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
+    // Auto Slug
+    useEffect(() => {
+        if (title) {
+            setSlug(title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''));
+        }
+    }, [title]);
+
+    // Handlers
+    const handleFeatureChange = (index, value, isEn = false) => {
+        const targetState = isEn ? featuresEn : features;
+        const setTargetState = isEn ? setFeaturesEn : setFeatures;
+        const newFeatures = [...targetState];
         newFeatures[index] = value;
-        setFeatures(newFeatures);
+        setTargetState(newFeatures);
     };
-    const addFeature = () => setFeatures([...features, '']);
-    const removeFeature = (index) => setFeatures(features.filter((_, i) => i !== index));
 
-    // ================== INI BAGIAN LOGIKA YANG DIPERBAIKI (SAMA SEPERTI EDIT) ==================
+    const addFeature = (isEn = false) => {
+        const targetState = isEn ? featuresEn : features;
+        const setTargetState = isEn ? setFeaturesEn : setFeatures;
+        setTargetState([...targetState, '']);
+    };
 
+    const removeFeature = (index, isEn = false) => {
+        const targetState = isEn ? featuresEn : features;
+        const setTargetState = isEn ? setFeaturesEn : setFeatures;
+        setTargetState(targetState.filter((_, i) => i !== index));
+    };
+
+    // Translation Logic
+    const handleTranslate = async (text, targetSetter) => {
+        if (!text) return;
+        try {
+            const res = await fetch('/api/translate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text, sourceLang: 'id', targetLang: 'en' }),
+            });
+            const data = await res.json();
+            if (data.translatedText) targetSetter(data.translatedText);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const handleAutoTranslate = async () => {
+        setIsTranslating(true);
+        try {
+            if (title && !titleEn) await handleTranslate(title, setTitleEn);
+            if (shortDescription && !shortDescriptionEn) await handleTranslate(shortDescription, setShortDescriptionEn);
+
+            // Translate Features
+            if (features.length > 0 && (featuresEn.length === 1 && !featuresEn[0])) {
+                const translatedFeatures = await Promise.all(features.map(async (f) => {
+                    if (!f) return '';
+                    const res = await fetch('/api/translate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ text: f, sourceLang: 'id', targetLang: 'en' }),
+                    });
+                    const data = await res.json();
+                    return data.translatedText || '';
+                }));
+                setFeaturesEn(translatedFeatures);
+            }
+        } catch (error) {
+            alert('Auto-translation failed. Please try again.');
+        } finally {
+            setIsTranslating(false);
+        }
+    };
+
+    // Page Builder Handlers (Same as original)
     const addBlock = (type) => {
         const newBlock = {
-            id: `block-${Date.now()}`, // ID unik sementara
+            id: `block-${Date.now()}`,
             type: type,
-            content: type === 'richText' 
-                ? '<p>Teks baru...</p>' 
+            content: type === 'richText'
+                ? '<p>Teks baru...</p>'
                 : { imageUrl: '', text: '<h2>Judul Fitur</h2><p>Penjelasan fitur...</p>', imageFile: null, imagePosition: 'left' }
         };
         setPageContent([...pageContent, newBlock]);
     };
-    
-    // Handler KHUSUS untuk 'richText' (TextBlock) yang menerima STRING
+
     const updateTextBlockContent = (index, newContentString) => {
         const updatedPageContent = [...pageContent];
-        // Langsung timpa field 'content' dengan string baru. Ini adalah Kunci Perbaikannya.
         updatedPageContent[index].content = newContentString;
         setPageContent(updatedPageContent);
     };
 
-    // Handler KHUSUS untuk 'imageLeftTextRight' (ImageTextBlock) yang menerima OBJECT
     const updateImageTextBlockContent = (index, newContentObject) => {
         const updatedPageContent = [...pageContent];
-        // Langsung timpa field 'content' dengan objek baru.
         updatedPageContent[index].content = newContentObject;
         setPageContent(updatedPageContent);
     };
-    
+
     const removeBlock = (index) => setPageContent(pageContent.filter((_, i) => i !== index));
 
-    // ================== AKHIR DARI BAGIAN LOGIKA YANG DIPERBAIKI ==================
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -78,8 +161,6 @@ export default function CreateServicePage() {
 
         try {
             let heroImageUrl = '';
-
-            // Proses upload gambar utama jika ada
             if (heroImage) {
                 const heroFormData = new FormData();
                 heroFormData.append('file', heroImage);
@@ -89,8 +170,7 @@ export default function CreateServicePage() {
                 if (!heroResponse.ok) throw new Error(heroData.error.message);
                 heroImageUrl = heroData.secure_url;
             }
-            
-            // Proses gambar di dalam blok konten
+
             const processedPageContent = await Promise.all(pageContent.map(async (block) => {
                 if (block.type === 'imageLeftTextRight' && block.content.imageFile) {
                     const blockFormData = new FormData();
@@ -99,12 +179,9 @@ export default function CreateServicePage() {
                     const blockResponse = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`, { method: 'POST', body: blockFormData });
                     const blockData = await blockResponse.json();
                     if (!blockResponse.ok) throw new Error(blockData.error.message);
-                    
-                    // Buat konten bersih tanpa imageFile
                     const { imageFile, ...restOfContent } = block.content;
                     return { ...block, content: { ...restOfContent, imageUrl: blockData.secure_url } };
                 }
-                 // Jika tidak ada file gambar baru, pastikan properti imageFile dihapus
                 if (block.content && block.content.imageFile) {
                     const { imageFile, ...restOfContent } = block.content;
                     return { ...block, content: restOfContent };
@@ -112,16 +189,18 @@ export default function CreateServicePage() {
                 return block;
             }));
 
-            // Tambahkan dokumen baru ke Firestore
             await addDoc(collection(db, 'services'), {
-                title,
-                slug,
-                shortDescription,
-                heroImageUrl,
-                pricingCategory,
+                title, slug, shortDescription, heroImageUrl, pricingCategory,
                 featuresList: features.filter(f => f),
-                pageContent: processedPageContent, // Data sudah dijamin benar
+
+                // English Fields
+                title_en: titleEn || null,
+                shortDescription_en: shortDescriptionEn || null,
+                featuresList_en: featuresEn.filter(f => f),
+
+                pageContent: processedPageContent,
                 createdAt: serverTimestamp(),
+                published: true
             });
 
             alert("Layanan baru berhasil dibuat!");
@@ -135,83 +214,166 @@ export default function CreateServicePage() {
         }
     };
 
-    if (loading) return <div className="bg-white text-black min-h-screen flex items-center justify-center">Loading...</div>;
+    if (!isMounted || loading) return <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900"><Loader2 className="animate-spin text-green-500 w-10 h-10" /></div>;
 
-    // ================== BAGIAN JSX - TAMPILAN TIDAK DIUBAH SAMA SEKALI ==================
     if (user) {
         return (
-            <div className="bg-white dark:bg-gray-900 text-black dark:text-gray-100 min-h-screen p-8">
-                <div className="max-w-4xl mx-auto">
-                    <Link href="/admin" className="text-blue-600 dark:text-white hover:underline mb-6 block">← Back to Dashboard</Link>
-                    <h1 className="text-3xl font-bold mb-8">Create New Service</h1>
-                    <form onSubmit={handleSubmit} className="space-y-8">
-                        <div className="p-6 bg-[#2ECC71]/10 rounded-lg space-y-4">
-                            <div>
-                                <label className="block text-lg font-medium mb-1">Judul Layanan</label>
-                                <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required className="w-full p-2 border border-gray-300 rounded-md bg-[#2ECC71]/15 text-black dark:text-gray-100" />
-                            </div>
-                            <div>
-                                <label className="block text-lg font-medium mb-1">Slug (URL)</label>
-                                <input type="text" value={slug} onChange={(e) => setSlug(e.target.value)} required className="w-full p-2 border border-gray-300 rounded-md bg-[#2ECC71]/15 text-black dark:text-gray-100" />
-                            </div>
-                            <div>
-                                <label className="block text-lg font-medium mb-1">Kategori Harga</label>
-                                <select value={pricingCategory} onChange={(e) => setPricingCategory(e.target.value)} required className="w-full p-2 border border-gray-300 rounded-md bg-[#2ECC71]/15 text-black dark:text-gray-100">
-                                    <option value="seo">Jasa SEO</option>
-                                    <option value="ads">Jasa Ads</option>
-                                    <option value="web-design">Jasa Web Design</option>
-                                    <option value="app">Jasa App Development</option>
-                                    <option value="dash">Jasa Dashboard</option>
-                                    <option value="brand">Jasa Branding</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-lg font-medium mb-1">Deskripsi Singkat</label>
-                                <textarea value={shortDescription} onChange={(e) => setShortDescription(e.target.value)} rows={3} required className="w-full p-2 border border-gray-300 rounded-md bg-[#2ECC71]/15 text-black dark:text-gray-100" />
-                            </div>
-                            <div>
-                                <label className="block text-lg font-medium mb-1">Gambar Utama</label>
-                                <input type="file" onChange={(e) => setHeroImage(e.target.files[0])} accept="image/png, image/jpeg, image/webp" className="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#2ECC71] file:text-white hover:file:bg-[#2ECC71]/80 file:cursor-pointer" />
-                            </div>
-                            <div>
-                                <label className="block text-lg font-medium mb-2">Fitur Unggulan</label>
-                                <div className="space-y-2">
-                                    {features.map((feature, index) => (
-                                        <div key={index} className="flex items-center gap-2">
-                                            <input type="text" value={feature} onChange={(e) => handleFeatureChange(index, e.target.value)} className="w-full p-2 border border-gray-300 rounded-md bg-[#2ECC71]/15 text-black dark:text-gray-100" placeholder={`Fitur #${index + 1}`} />
-                                            <button type="button" onClick={() => removeFeature(index)} className="bg-red-600 text-white px-3 py-2 rounded-md">×</button>
+            <div className="bg-gray-50 dark:bg-gray-900 min-h-screen p-4 md:p-8 font-sans">
+                <div className="max-w-6xl mx-auto space-y-8">
+
+                    {/* Header */}
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div className='space-y-2'>
+                            <Link href="/admin" className="inline-flex items-center text-sm text-gray-500 hover:text-green-600 transition-colors">
+                                <ArrowLeft className="w-4 h-4 mr-1" /> Kembali ke Dashboard
+                            </Link>
+                            <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">Buat Layanan Baru</h1>
+                        </div>
+                        <div className="flex gap-3">
+                            <button
+                                type="button"
+                                onClick={handleAutoTranslate}
+                                disabled={isTranslating}
+                                className="hidden md:flex items-center px-4 py-2 bg-blue-50 text-blue-600 rounded-lg font-semibold hover:bg-blue-100 transition-colors border border-blue-200"
+                            >
+                                {isTranslating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
+                                Auto-Translate Info
+                            </button>
+                            <button
+                                onClick={handleSubmit}
+                                disabled={isLoading}
+                                className="flex-1 md:flex-none items-center justify-center px-6 py-3 bg-[#2ECC71] text-white rounded-lg font-bold hover:bg-green-600 transition-all shadow-lg"
+                            >
+                                {isLoading ? <Loader2 className="animate-spin w-5 h-5" /> : 'Simpan Layanan'}
+                            </button>
+                        </div>
+                    </div>
+
+                    <form className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        {/* LEFT COLUMN */}
+                        <div className="lg:col-span-2 space-y-8">
+
+                            {/* ID Content */}
+                            <SectionCard title="Informasi Utama (Indonesia)" icon={FileText} className="border-l-4 border-l-[#2ECC71]">
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-semibold mb-2">Judul Layanan</label>
+                                        <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} className="w-full p-3 rounded-lg border bg-gray-50 dark:bg-gray-700 dark:border-gray-600" placeholder="e.g. Jasa Pembuatan Website" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-semibold mb-2">Deskripsi Singkat</label>
+                                        <textarea value={shortDescription} onChange={(e) => setShortDescription(e.target.value)} rows={3} className="w-full p-3 rounded-lg border bg-gray-50 dark:bg-gray-700 dark:border-gray-600" placeholder="Deskripsi singkat layanan..." />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-semibold mb-2">Fitur Unggulan</label>
+                                        <div className="space-y-2">
+                                            {features.map((feature, index) => (
+                                                <div key={index} className="flex gap-2">
+                                                    <input type="text" value={feature} onChange={(e) => handleFeatureChange(index, e.target.value)} className="w-full p-2 border rounded-md bg-gray-50 dark:bg-gray-700" placeholder="Fitur..." />
+                                                    <button type="button" onClick={() => removeFeature(index)} className="p-2 text-red-500 hover:bg-red-50 rounded"><Trash2 className="w-4 h-4" /></button>
+                                                </div>
+                                            ))}
+                                            <button type="button" onClick={() => addFeature()} className="text-sm text-green-600 flex items-center gap-1 font-semibold"><Plus className="w-4 h-4" /> Tambah Fitur</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </SectionCard>
+
+                            {/* EN Content */}
+                            <SectionCard title="English Translation" icon={Globe} className="border-l-4 border-l-blue-500">
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-semibold mb-2">Service Title (EN)</label>
+                                        <input type="text" value={titleEn} onChange={(e) => setTitleEn(e.target.value)} className="w-full p-3 rounded-lg border bg-gray-50 dark:bg-gray-700 dark:border-gray-600" placeholder="e.g. Website Development Service" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-semibold mb-2">Short Description (EN)</label>
+                                        <textarea value={shortDescriptionEn} onChange={(e) => setShortDescriptionEn(e.target.value)} rows={3} className="w-full p-3 rounded-lg border bg-gray-50 dark:bg-gray-700 dark:border-gray-600" placeholder="Short description..." />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-semibold mb-2">Key Features (EN)</label>
+                                        <div className="space-y-2">
+                                            {featuresEn.map((feature, index) => (
+                                                <div key={index} className="flex gap-2">
+                                                    <input type="text" value={feature} onChange={(e) => handleFeatureChange(index, e.target.value, true)} className="w-full p-2 border rounded-md bg-gray-50 dark:bg-gray-700" placeholder="Feature..." />
+                                                    <button type="button" onClick={() => removeFeature(index, true)} className="p-2 text-red-500 hover:bg-red-50 rounded"><Trash2 className="w-4 h-4" /></button>
+                                                </div>
+                                            ))}
+                                            <button type="button" onClick={() => addFeature(true)} className="text-sm text-blue-600 flex items-center gap-1 font-semibold"><Plus className="w-4 h-4" /> Add Feature</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </SectionCard>
+
+                            {/* Page Builder */}
+                            <div className="space-y-4">
+                                <h2 className="text-xl font-bold flex items-center gap-2"><Layout className="w-5 h-5" /> Page Content Builder</h2>
+                                <div className="space-y-4 p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl">
+                                    {pageContent.map((block, index) => (
+                                        <div key={block.id || index} className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg relative group border border-gray-200 dark:border-gray-700 shadow-sm">
+                                            <button type="button" onClick={() => removeBlock(index)} className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"><Trash2 className="w-4 h-4" /></button>
+                                            <h3 className="font-bold mb-4 text-xs uppercase tracking-wider text-gray-500">{block.type === 'richText' ? 'Rich Text Block' : 'Split Image & Text Block'}</h3>
+
+                                            {block.type === 'richText' && (
+                                                <TextBlock content={block.content} onUpdate={(newContent) => updateTextBlockContent(index, newContent)} />
+                                            )}
+                                            {block.type === 'imageLeftTextRight' && (
+                                                <ImageTextBlock content={block.content} onUpdate={(newContent) => updateImageTextBlockContent(index, newContent)} />
+                                            )}
                                         </div>
                                     ))}
-                                </div>
-                                <button type="button" onClick={addFeature} className="mt-2 bg-[#2ECC71] text-white px-4 py-2 rounded-md text-sm">+ Tambah Fitur</button>
-                            </div>
-                        </div>
-                        <div>
-                            <label className="block text-xl font-semibold mb-4">Konten Halaman (Page Builder)</label>
-                            <div className="space-y-4 p-4 border-2 border-dashed border-gray-300 rounded-lg">
-                                {pageContent.map((block, index) => (
-                                    <div key={block.id || index} className="bg-gray-100 p-4 rounded-md relative group">
-                                        <button type="button" onClick={() => removeBlock(index)} className="absolute top-2 right-2 bg-red-500 text-white w-7 h-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">×</button>
-                                        <h3 className="font-bold mb-2 text-sm uppercase text-gray-500">{block.type === 'richText' ? 'Blok Teks' : 'Blok Gambar & Teks'}</h3>
-                                        
-                                        {/* PANGGIL HANDLER YANG BENAR DI SINI */}
-                                        {block.type === 'richText' && (
-                                            <TextBlock content={block.content} onUpdate={(newContent) => updateTextBlockContent(index, newContent)} />
-                                        )}
-                                        {block.type === 'imageLeftTextRight' && (
-                                            <ImageTextBlock content={block.content} onUpdate={(newContent) => updateImageTextBlockContent(index, newContent)} />
-                                        )}
+                                    <div className="flex gap-4 pt-4 justify-center">
+                                        <button type="button" onClick={() => addBlock('richText')} className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">+ Add Text Block</button>
+                                        <button type="button" onClick={() => addBlock('imageLeftTextRight')} className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">+ Add Image/Text Split</button>
                                     </div>
-                                ))}
-                                <div className="flex gap-4 pt-4 border-t border-gray-200">
-                                    <button type="button" onClick={() => addBlock('richText')} className="bg-blue-600 text-white px-4 py-2 rounded-md">+ Tambah Blok Teks</button>
-                                    <button type="button" onClick={() => addBlock('imageLeftTextRight')} className="bg-teal-600 text-white px-4 py-2 rounded-md">+ Tambah Blok Gambar & Teks</button>
                                 </div>
                             </div>
                         </div>
-                        <button type="submit" disabled={isLoading} className="w-full px-6 py-4 bg-yellow-500 text-black font-bold rounded-md text-lg hover:bg-yellow-600 disabled:bg-gray-500">
-                            {isLoading ? 'Menyimpan...' : 'Simpan Layanan'}
-                        </button>
+
+                        {/* RIGHT COLUMN */}
+                        <div className="space-y-8 h-fit lg:sticky lg:top-8">
+                            <SectionCard title="Settings" icon={Box}>
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-semibold mb-2">Slug</label>
+                                        <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
+                                            <span className="p-3 text-gray-500 select-none text-sm border-r border-gray-300 dark:border-gray-600">/layanan/</span>
+                                            <input type="text" value={slug} onChange={(e) => setSlug(e.target.value)} className="w-full p-3 bg-transparent outline-none text-sm" />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-semibold mb-2">Category</label>
+                                        <select value={pricingCategory} onChange={(e) => setPricingCategory(e.target.value)} className="w-full p-3 rounded-lg border bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
+                                            <option value="seo">Jasa SEO</option>
+                                            <option value="ads">Jasa Google Ads</option>
+                                            <option value="web">Jasa Web Design</option>
+                                            <option value="app">App Development</option>
+                                            <option value="dash">Dashboard System</option>
+                                            <option value="brand">Branding</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-semibold mb-2">Hero Image</label>
+                                        <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer relative">
+                                            <input
+                                                type="file"
+                                                onChange={(e) => setHeroImage(e.target.files[0])}
+                                                accept="image/*"
+                                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                            />
+                                            {heroImage ? (
+                                                <p className="text-sm font-semibold text-green-600 truncate">{heroImage.name}</p>
+                                            ) : (
+                                                <div className="space-y-1 text-gray-400">
+                                                    <ImagePlus className="w-8 h-8 mx-auto" />
+                                                    <p className="text-xs">Upload Hero Image</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </SectionCard>
+                        </div>
                     </form>
                 </div>
             </div>

@@ -7,11 +7,16 @@ module.exports = {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
   ],
 
-  darkMode : 'class', // atau 'media' jika ingin otomatis
+  darkMode: 'class', // atau 'media' jika ingin otomatis
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: ['var(--font-inter)', 'sans-serif'],
+        serif: ['var(--font-merriweather)', 'serif'],
+      },
+    },
   },
   plugins: [
-    // Array plugins ini sekarang dikosongkan
+    require('@tailwindcss/typography'),
   ],
 }
