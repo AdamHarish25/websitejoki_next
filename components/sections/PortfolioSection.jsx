@@ -12,6 +12,13 @@ export default function PortfolioSection() {
     // Anda bisa mengganti data ini dengan data dari database/CMS nanti
     const projects = [
         {
+            title: t('portfolio.projects.inoted.title'),
+            image: "/portfolio/Inoted.png", // Ganti dengan path gambar Anda
+            logo: "/portfolio/logo/Inoted.png", // Ganti dengan path logo Anda
+            alt: t('portfolio.projects.inoted.alt'),
+            link: "https://inoted-daily.netlify.app/"
+        },
+        {
             title: t('portfolio.projects.adaloker.title'),
             image: "/portfolio/Adaloker.png", // Ganti dengan path gambar Anda
             logo: "/portfolio/logo/Adaloker.svg", // Ganti dengan path logo Anda
