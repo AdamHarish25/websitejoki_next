@@ -6,16 +6,19 @@ import { FaTimes, FaWhatsapp } from 'react-icons/fa';
 import { FiMenu, FiX } from 'react-icons/fi';
 import { trackEvent } from '@/lib/analytics';
 import { RefreshingLink } from './RefreshingLink';
+import LanguageSwitcher from './LanguageSwitcher';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { t } = useLanguage();
 
   const navLinks = [
-    { name: "Beranda", href: "/" },
-    { name: "Layanan", href: "/layanan" },
-    { name: "Portfolio", href: "/#portfolio" },
-    { name: "Blog", href: "/blog" },
-    { name: "FAQ", href: "/#faq" },
+    { name: t('navbar.home'), href: "/" },
+    { name: t('navbar.services'), href: "/layanan" },
+    { name: t('navbar.portfolio'), href: "/#portfolio" },
+    { name: t('navbar.blog'), href: "/blog" },
+    { name: t('navbar.faq'), href: "/#faq" },
   ];
 
   useEffect(() => {
@@ -26,9 +29,9 @@ export default function Navbar() {
     }
   }, [isMenuOpen]);
 
-  const closeMenu = () => {setIsMenuOpen(false)};
+  const closeMenu = () => { setIsMenuOpen(false) };
 
-   const handleClick = () => {
+  const handleClick = () => {
     trackEvent({
       action: 'click_whatsapp',
       category: 'Contact',
@@ -53,15 +56,16 @@ export default function Navbar() {
         {/* Navigasi Desktop */}
         <div className="hidden lg:flex items-center space-x-8">
           {navLinks.map((link) => (
-            <RefreshingLink key={link.name} href={link.href} className="text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors duration-300capitalize">
+            <RefreshingLink key={link.name} href={link.href} className="text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors duration-300 capitalize">
               {link.name}
             </RefreshingLink>
           ))}
+          <LanguageSwitcher />
         </div>
 
         {/* Tombol Konsultasi Desktop */}
         <Link onClick={handleClick} href="https://wa.me/6285179808325" target="_blank" className="hidden lg:flex px-6 py-3 rounded-full items-center justify-center gap-3 text-white bg-green-600 shadow-md transition-transform hover:scale-95">
-          Konsultasi Gratis <FaWhatsapp />
+          {t('navbar.contact')} <FaWhatsapp />
         </Link>
 
         {/* Tombol Menu Mobile */}
@@ -80,11 +84,14 @@ export default function Navbar() {
               {link.name}
             </RefreshingLink>
           ))}
+          <div className="flex justify-center pb-4">
+            <LanguageSwitcher />
+          </div>
           <Link href="https://wa.me/6285179808325" target="_blank" onClick={() => {
             closeMenu(),
-            handleClick
+              handleClick
           }} className="flex px-6 py-4 rounded-full items-center justify-center gap-4 text-white bg-[#2ECC71] shadow-md transition-transform hover:scale-95 text-lg">
-            Konsultasi Gratis <FaWhatsapp />
+            {t('navbar.contact')} <FaWhatsapp />
           </Link>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import { Inter } from 'next/font/google';
 import Script from 'next/script'; // 1. Impor komponen Script
 import './globals.css';
+import { LanguageProvider } from '@/context/LanguageContext';
 
 const inter = Inter({ subsets: ['latin'] });
 const GA_TRACKING_ID = "G-X1F87S6FBB"; // <-- ID Anda dari screenshot
@@ -11,7 +12,7 @@ export const metadata = {
 };
 
 
-export default function RootLayout({ children }) {  
+export default function RootLayout({ children }) {
   return (
     <html lang="id">
       {/* 2. Tambahkan dua komponen Script ini di dalam <html>, di atas <body> */}
@@ -33,10 +34,12 @@ export default function RootLayout({ children }) {
           `,
         }}
       />
-      
-  <body className={`${inter.className} bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100`}>
-        {/* Navbar dan Footer akan dirender di sini oleh layout lain atau page */}
-        {children}
+
+      <body className={`${inter.className} bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100`}>
+        <LanguageProvider>
+          {/* Navbar dan Footer akan dirender di sini oleh layout lain atau page */}
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   );

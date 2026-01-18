@@ -1,10 +1,12 @@
 import { Users, Clock, Star } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function StatsSection() {
+  const { t } = useLanguage();
   const stats = [
-    { icon: <Users size={40} />, value: "100+", label: "Klien Puas Pada Kami" },
-    { icon: <Clock size={40} />, value: "5+", label: "Tahun Pengalaman" },
-    { icon: <Star size={40} />, value: "95+", label: "Review Positif Dari Mereka" },
+    { icon: <Users size={40} />, value: "100+", label: t('stats.clients') },
+    { icon: <Clock size={40} />, value: "5+", label: t('stats.experience') },
+    { icon: <Star size={40} />, value: "95+", label: t('stats.reviews') },
   ];
   return (
     <section className="bg-green-600 text-white">
