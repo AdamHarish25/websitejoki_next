@@ -39,7 +39,7 @@ export default function HeroSection() {
             </Link>
           </div>
           <div className="flex items-center pt-4 text-sm text-gray-500">
-            <HeroSocialProof />
+            <HeroSocialProof lang={t('hero.lang')} />
           </div>
         </div>
         <div className="relative w-full h-fit rounded-xl overflow-hidden shadow-2xl">
