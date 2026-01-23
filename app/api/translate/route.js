@@ -8,51 +8,71 @@ export async function POST(request) {
             return NextResponse.json({ error: 'Text is required' }, { status: 400 });
         }
 
-        // Use POST to avoid URL length limits with large content
-        // MOVE sl and tl to URL, keep q in body
-        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang}&tl=${targetLang}&dt=t`;
+        const fetchWithClient = async (client) => {
+            const url = `https://translate.googleapis.com/translate_a/single?client=${client}&sl=${sourceLang}&tl=${targetLang}&dt=t`;
+            const formData = new URLSearchParams();
+            formData.append('q', text);
 
-        console.log(`[Translate API] Translating ${text.length} chars from ${sourceLang} to ${targetLang}`);
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                },
+                body: formData.toString()
+            });
 
-        const formData = new URLSearchParams();
-        formData.append('q', text);
+            if (!response.ok) {
+                throw new Error(`Status ${response.status}`);
+            }
+            return response.json();
+        };
 
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-            },
-            body: formData.toString()
-        });
+        const fetchMyMemory = async () => {
+            const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${sourceLang}|${targetLang}`;
+            const res = await fetch(url);
+            const data = await res.json();
+            if (res.ok && data.responseStatus === 200) {
+                return data.responseData.translatedText;
+            }
+            throw new Error(data.responseDetails || 'MyMemory Failed');
+        };
 
-        console.log(`[Translate API] Upstream status: ${response.status}`);
+        let data;
+        let translatedText = '';
+        let provider = 'google';
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Upstream Translation Error:', response.status, errorText);
-            throw new Error(`Translation service failed with status ${response.status}`);
+        try {
+            data = await fetchWithClient('gtx');
+        } catch (e) {
+            console.warn(`'gtx' client failed: ${e.message}. Retrying with 'te'...`);
+            try {
+                data = await fetchWithClient('te');
+            } catch (e2) {
+                console.warn(`'te' client failed: ${e2.message}. Retrying with 'tw-ob'...`);
+                try {
+                    data = await fetchWithClient('tw-ob');
+                } catch (e3) {
+                    console.warn(`All Google clients failed. Retrying with MyMemory...`);
+                    provider = 'mymemory';
+                }
+            }
         }
 
-        const data = await response.json();
-
-        // Safe parsing of the nested array response
-        // Format is typically: [[["translated", "source", ...], ...], ...]
-        if (!data || !Array.isArray(data) || !data[0]) {
-            // Sometimes it returns just the array if simple? No, usually nested.
-            // If Google blocks, it returns HTML (caught by response.ok check above usually, but maybe 200 OK with captcha?)
-            console.error("Invalid Structure:", JSON.stringify(data).substring(0, 200));
-            throw new Error('Unexpected response format from translation service');
+        if (provider === 'google') {
+            if (!data || !Array.isArray(data) || !data[0]) {
+                // Final attempt with MyMemory if Google returned invalid format
+                console.warn("Google returned invalid format, trying MyMemory");
+                translatedText = await fetchMyMemory();
+            } else {
+                translatedText = data[0]
+                    .map(item => (Array.isArray(item) && item[0]) ? item[0] : '')
+                    .join('');
+            }
+        } else {
+            // MyMemory
+            translatedText = await fetchMyMemory();
         }
-
-        const paragraphs = data[0];
-        if (!Array.isArray(paragraphs)) {
-            throw new Error('Unexpected paragraph format');
-        }
-
-        const translatedText = paragraphs
-            .map(item => (Array.isArray(item) && item[0]) ? item[0] : '')
-            .join('');
 
         return NextResponse.json({ translatedText });
 

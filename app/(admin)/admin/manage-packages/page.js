@@ -33,8 +33,8 @@ export default function ManagePackagesPage() {
         fetchPackages();
     }, []);
 
-    // Translation Handler
-    const handleTranslate = async (text) => {
+    // Helper for sequential translation
+    const translateText = async (text) => {
         if (!text) return '';
         try {
             const res = await fetch('/api/translate', {
@@ -42,11 +42,12 @@ export default function ManagePackagesPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ text, sourceLang: 'id', targetLang: 'en' }),
             });
+            if (!res.ok) return text;
             const data = await res.json();
-            return data.translatedText || '';
+            return data.translatedText || text;
         } catch (err) {
             console.error(err);
-            return text; // Fallback to source
+            return text;
         }
     };
 
@@ -54,13 +55,26 @@ export default function ManagePackagesPage() {
         setIsTranslating(true);
         try {
             const updates = {};
-            if (form.name && !form.nameEn) updates.nameEn = await handleTranslate(form.name);
-            if (form.subtitle && !form.subtitleEn) updates.subtitleEn = await handleTranslate(form.subtitle);
-            if (form.description && !form.descriptionEn) updates.descriptionEn = await handleTranslate(form.description);
-            if (form.features && !form.featuresEn) updates.featuresEn = await handleTranslate(form.features); // Translator usually handles newlines OK-ish
+
+            // Translate explicit fields if EN is empty
+            if (form.name && !form.nameEn) updates.nameEn = await translateText(form.name);
+            if (form.subtitle && !form.subtitleEn) updates.subtitleEn = await translateText(form.subtitle);
+            if (form.description && !form.descriptionEn) updates.descriptionEn = await translateText(form.description);
+
+            // Translate Features line-by-line for better accuracy
+            if (form.features && !form.featuresEn) {
+                const featuresList = form.features.split('\n').filter(f => f.trim() !== '');
+                const translatedFeatures = [];
+                for (const f of featuresList) {
+                    const trans = await translateText(f);
+                    translatedFeatures.push(trans);
+                }
+                updates.featuresEn = translatedFeatures.join('\n');
+            }
 
             setForm(prev => ({ ...prev, ...updates }));
         } catch (error) {
+            console.error(error);
             alert('Auto-translation failed');
         } finally {
             setIsTranslating(false);
