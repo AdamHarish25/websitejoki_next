@@ -44,6 +44,10 @@ export default function CreateServicePage() {
     const [heroImage, setHeroImage] = useState(null);
     const [pageContent, setPageContent] = useState([]);
 
+    // Content Builder Logic
+    const [activeTab, setActiveTab] = useState('id'); // 'id' or 'en'
+    const [pageContentEn, setPageContentEn] = useState([]);
+
     const [isLoading, setIsLoading] = useState(false);
 
     // Translation Loading
@@ -81,75 +85,134 @@ export default function CreateServicePage() {
         setTargetState(targetState.filter((_, i) => i !== index));
     };
 
-    // Translation Logic
-    const handleTranslate = async (text, targetSetter) => {
-        if (!text) return;
+    // Helper for sequential translation to avoid rate limits
+    const translateText = async (text) => {
+        if (!text) return '';
         try {
             const res = await fetch('/api/translate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ text, sourceLang: 'id', targetLang: 'en' }),
             });
+            if (!res.ok) return text; // Fallback to original
             const data = await res.json();
-            if (data.translatedText) targetSetter(data.translatedText);
-        } catch (err) {
-            console.error(err);
+            return data.translatedText || text;
+        } catch (e) {
+            console.error("Translation failed:", e);
+            return text;
         }
     };
 
     const handleAutoTranslate = async () => {
         setIsTranslating(true);
         try {
-            if (title && !titleEn) await handleTranslate(title, setTitleEn);
-            if (shortDescription && !shortDescriptionEn) await handleTranslate(shortDescription, setShortDescriptionEn);
-
-            // Translate Features
-            if (features.length > 0 && (featuresEn.length === 1 && !featuresEn[0])) {
-                const translatedFeatures = await Promise.all(features.map(async (f) => {
-                    if (!f) return '';
-                    const res = await fetch('/api/translate', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ text: f, sourceLang: 'id', targetLang: 'en' }),
-                    });
-                    const data = await res.json();
-                    return data.translatedText || '';
-                }));
-                setFeaturesEn(translatedFeatures);
+            if (title && !titleEn) {
+                const globalTitle = await translateText(title);
+                setTitleEn(globalTitle);
             }
+            if (shortDescription && !shortDescriptionEn) {
+                const globalDesc = await translateText(shortDescription);
+                setShortDescriptionEn(globalDesc);
+            }
+
+            // Translate Features Sequentially
+            if (features.length > 0 && (featuresEn.length === 1 && !featuresEn[0])) {
+                const newFeaturesEn = [];
+                for (const f of features) {
+                    const trans = await translateText(f);
+                    newFeaturesEn.push(trans);
+                }
+                setFeaturesEn(newFeaturesEn);
+            }
+
+            // Translate Page Content Sequentially (Mirror ID to EN)
+            if (pageContent.length > 0 && pageContentEn.length === 0) {
+                const newPageContentEn = [];
+                for (const block of pageContent) {
+                    // Deep copy
+                    const newBlock = JSON.parse(JSON.stringify(block));
+                    newBlock.id = `block-en-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+                    if (newBlock.type === 'richText') {
+                        newBlock.content = await translateText(newBlock.content);
+                    } else if (newBlock.type === 'imageLeftTextRight') {
+                        newBlock.content.text = await translateText(newBlock.content.text);
+                        // Re-attach file object if it exists
+                        if (block.content.imageFile) {
+                            newBlock.content.imageFile = block.content.imageFile;
+                        }
+                    }
+                    newPageContentEn.push(newBlock);
+                }
+                setPageContentEn(newPageContentEn);
+            }
+
         } catch (error) {
-            alert('Auto-translation failed. Please try again.');
+            console.error("Auto translate error:", error);
+            alert('Auto-translation partially failed. Some fields might not remain translated.');
         } finally {
             setIsTranslating(false);
         }
     };
 
-    // Page Builder Handlers (Same as original)
+    // Content Builder Logic
+
+
+    // Page Builder Handlers
     const addBlock = (type) => {
+        const targetState = activeTab === 'en' ? pageContentEn : pageContent;
+        const setTargetState = activeTab === 'en' ? setPageContentEn : setPageContent;
         const newBlock = {
             id: `block-${Date.now()}`,
             type: type,
             content: type === 'richText'
-                ? '<p>Teks baru...</p>'
-                : { imageUrl: '', text: '<h2>Judul Fitur</h2><p>Penjelasan fitur...</p>', imageFile: null, imagePosition: 'left' }
+                ? (activeTab === 'en' ? '<p>New text...</p>' : '<p>Teks baru...</p>')
+                : { imageUrl: '', text: activeTab === 'en' ? '<h2>Feature Title</h2><p>Feature description...</p>' : '<h2>Judul Fitur</h2><p>Penjelasan fitur...</p>', imageFile: null, imagePosition: 'left' }
         };
-        setPageContent([...pageContent, newBlock]);
+        setTargetState([...targetState, newBlock]);
     };
 
     const updateTextBlockContent = (index, newContentString) => {
-        const updatedPageContent = [...pageContent];
+        const targetState = activeTab === 'en' ? pageContentEn : pageContent;
+        const setTargetState = activeTab === 'en' ? setPageContentEn : setPageContent;
+        const updatedPageContent = [...targetState];
         updatedPageContent[index].content = newContentString;
-        setPageContent(updatedPageContent);
+        setTargetState(updatedPageContent);
     };
 
     const updateImageTextBlockContent = (index, newContentObject) => {
-        const updatedPageContent = [...pageContent];
+        const targetState = activeTab === 'en' ? pageContentEn : pageContent;
+        const setTargetState = activeTab === 'en' ? setPageContentEn : setPageContent;
+        const updatedPageContent = [...targetState];
         updatedPageContent[index].content = newContentObject;
-        setPageContent(updatedPageContent);
+        setTargetState(updatedPageContent);
     };
 
-    const removeBlock = (index) => setPageContent(pageContent.filter((_, i) => i !== index));
+    const removeBlock = (index) => {
+        const targetState = activeTab === 'en' ? pageContentEn : pageContent;
+        const setTargetState = activeTab === 'en' ? setPageContentEn : setPageContent;
+        setTargetState(targetState.filter((_, i) => i !== index));
+    };
 
+    const processBlocks = async (blocks) => {
+        return Promise.all(blocks.map(async (block) => {
+            if (block.type === 'imageLeftTextRight' && block.content.imageFile) {
+                const blockFormData = new FormData();
+                blockFormData.append('file', block.content.imageFile);
+                blockFormData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET);
+                const blockResponse = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`, { method: 'POST', body: blockFormData });
+                const blockData = await blockResponse.json();
+                if (!blockResponse.ok) throw new Error(blockData.error.message);
+                const { imageFile, ...restOfContent } = block.content;
+                return { ...block, content: { ...restOfContent, imageUrl: blockData.secure_url } };
+            }
+            if (block.content && block.content.imageFile) {
+                const { imageFile, ...restOfContent } = block.content;
+                return { ...block, content: restOfContent };
+            }
+            return block;
+        }));
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -171,23 +234,8 @@ export default function CreateServicePage() {
                 heroImageUrl = heroData.secure_url;
             }
 
-            const processedPageContent = await Promise.all(pageContent.map(async (block) => {
-                if (block.type === 'imageLeftTextRight' && block.content.imageFile) {
-                    const blockFormData = new FormData();
-                    blockFormData.append('file', block.content.imageFile);
-                    blockFormData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET);
-                    const blockResponse = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`, { method: 'POST', body: blockFormData });
-                    const blockData = await blockResponse.json();
-                    if (!blockResponse.ok) throw new Error(blockData.error.message);
-                    const { imageFile, ...restOfContent } = block.content;
-                    return { ...block, content: { ...restOfContent, imageUrl: blockData.secure_url } };
-                }
-                if (block.content && block.content.imageFile) {
-                    const { imageFile, ...restOfContent } = block.content;
-                    return { ...block, content: restOfContent };
-                }
-                return block;
-            }));
+            const processedPageContent = await processBlocks(pageContent);
+            const processedPageContentEn = await processBlocks(pageContentEn);
 
             await addDoc(collection(db, 'services'), {
                 title, slug, shortDescription, heroImageUrl, pricingCategory,
@@ -199,6 +247,7 @@ export default function CreateServicePage() {
                 featuresList_en: featuresEn.filter(f => f),
 
                 pageContent: processedPageContent,
+                pageContent_en: processedPageContentEn,
                 createdAt: serverTimestamp(),
                 published: true
             });
@@ -213,6 +262,26 @@ export default function CreateServicePage() {
             setIsLoading(false);
         }
     };
+
+    // Labels for ID/EN
+    const builderLabels = activeTab === 'en' ? {
+        positionLabel: "Image Position",
+        leftLabel: "Left",
+        rightLabel: "Right",
+        uploadLabel: "Upload Image",
+        textLabel: "Accompanying Text"
+    } : {
+        positionLabel: "Posisi Gambar",
+        leftLabel: "Kiri",
+        rightLabel: "Kanan",
+        uploadLabel: "Upload Gambar",
+        textLabel: "Teks Pendamping"
+    };
+
+    // ... (rest of rendering) ...
+    // Inside return JSX, replacing "Page Builder" section 
+
+    /* ... existing JSX until Page Builder ... */
 
     if (!isMounted || loading) return <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900"><Loader2 className="animate-spin text-green-500 w-10 h-10" /></div>;
 
@@ -307,10 +376,29 @@ export default function CreateServicePage() {
 
                             {/* Page Builder */}
                             <div className="space-y-4">
-                                <h2 className="text-xl font-bold flex items-center gap-2"><Layout className="w-5 h-5" /> Page Content Builder</h2>
-                                <div className="space-y-4 p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl">
-                                    {pageContent.map((block, index) => (
-                                        <div key={block.id || index} className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg relative group border border-gray-200 dark:border-gray-700 shadow-sm">
+                                <div className="flex items-center justify-between">
+                                    <h2 className="text-xl font-bold flex items-center gap-2"><Layout className="w-5 h-5" /> Page Content Builder</h2>
+                                    <div className="flex bg-gray-200 dark:bg-gray-700 rounded-lg p-1">
+                                        <button
+                                            type="button"
+                                            onClick={() => setActiveTab('id')}
+                                            className={`px-3 py-1 text-sm font-bold rounded-md transition-all ${activeTab === 'id' ? 'bg-white dark:bg-gray-600 text-green-600 shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'}`}
+                                        >
+                                            🇮🇩 Indonesian
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setActiveTab('en')}
+                                            className={`px-3 py-1 text-sm font-bold rounded-md transition-all ${activeTab === 'en' ? 'bg-white dark:bg-gray-600 text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'}`}
+                                        >
+                                            🇺🇸 English
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className={`space-y-4 p-4 border-2 border-dashed rounded-xl transition-colors ${activeTab === 'en' ? 'border-blue-300 bg-blue-50/50' : 'border-gray-300 dark:border-gray-700'}`}>
+                                    {(activeTab === 'en' ? pageContentEn : pageContent).map((block, index) => (
+                                        <div key={block.id || index} className="bg-white dark:bg-gray-800 p-4 rounded-lg relative group border border-gray-200 dark:border-gray-700 shadow-sm">
                                             <button type="button" onClick={() => removeBlock(index)} className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"><Trash2 className="w-4 h-4" /></button>
                                             <h3 className="font-bold mb-4 text-xs uppercase tracking-wider text-gray-500">{block.type === 'richText' ? 'Rich Text Block' : 'Split Image & Text Block'}</h3>
 
@@ -318,13 +406,13 @@ export default function CreateServicePage() {
                                                 <TextBlock content={block.content} onUpdate={(newContent) => updateTextBlockContent(index, newContent)} />
                                             )}
                                             {block.type === 'imageLeftTextRight' && (
-                                                <ImageTextBlock content={block.content} onUpdate={(newContent) => updateImageTextBlockContent(index, newContent)} />
+                                                <ImageTextBlock content={block.content} onUpdate={(newContent) => updateImageTextBlockContent(index, newContent)} labels={builderLabels} />
                                             )}
                                         </div>
                                     ))}
                                     <div className="flex gap-4 pt-4 justify-center">
-                                        <button type="button" onClick={() => addBlock('richText')} className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">+ Add Text Block</button>
-                                        <button type="button" onClick={() => addBlock('imageLeftTextRight')} className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">+ Add Image/Text Split</button>
+                                        <button type="button" onClick={() => addBlock('richText')} className={`bg-white dark:bg-gray-700 border ${activeTab === 'en' ? 'border-blue-300' : 'border-gray-300 dark:border-gray-600'} px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors`}>+ Add Text Block</button>
+                                        <button type="button" onClick={() => addBlock('imageLeftTextRight')} className={`bg-white dark:bg-gray-700 border ${activeTab === 'en' ? 'border-blue-300' : 'border-gray-300 dark:border-gray-600'} px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors`}>+ Add Image/Text Split</button>
                                     </div>
                                 </div>
                             </div>

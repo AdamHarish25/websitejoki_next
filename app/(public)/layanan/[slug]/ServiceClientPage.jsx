@@ -55,13 +55,32 @@ function ImageTextSplitBlockDisplay({ imageUrl, text, imagePosition }) {
 }
 
 export default function ServiceClientPage({ service }) {
-    const { language } = useLanguage();
+    const { language, t } = useLanguage();
     const isEn = language === 'en';
 
     // Content Language Logic
-    const title = (isEn && service.title_en) ? service.title_en : service.title;
-    const shortDescription = (isEn && service.shortDescription_en) ? service.shortDescription_en : service.shortDescription;
+    let title = (isEn && service.title_en) ? service.title_en : service.title;
+    let shortDescription = (isEn && service.shortDescription_en) ? service.shortDescription_en : service.shortDescription;
     const featuresList = (isEn && service.featuresList_en && service.featuresList_en.length > 0) ? service.featuresList_en : service.featuresList || [];
+    const contentBlocks = (isEn && service.pageContent_en && service.pageContent_en.length > 0) ? service.pageContent_en : service.pageContent || [];
+
+    // Translation Logic (Auto-Translate Overlay)
+    // 1. Map DB category to translation keys
+    const categoryMap = {
+        'app': 'app',
+        'brand': 'hak_merk',
+        'web': 'website',
+        'dash': 'dashboard',
+        'ads': 'ads',
+        'seo': 'seo'
+    };
+    const transKey = categoryMap[service.pricingCategory];
+
+    // 2. Override with Centralized Translations if available
+    if (transKey) {
+        title = t(`services.items.${transKey}`);
+        shortDescription = t(`services.descriptions.${transKey}`);
+    }
 
     // Note: Page Content Blocks (richText etc) usually contain HTML. 
     // If we wanted them translated, we would have needed to translate them in Admin.
@@ -119,7 +138,7 @@ export default function ServiceClientPage({ service }) {
 
             {/* Page Builder Content Blocks */}
             <div className="space-y-4">
-                {service.pageContent && service.pageContent.map((block, index) => {
+                {contentBlocks && contentBlocks.map((block, index) => {
                     switch (block.type) {
                         case 'richText':
                             return <AnimatedSection key={index}><RichTextBlockDisplay content={block.content} /></AnimatedSection>;

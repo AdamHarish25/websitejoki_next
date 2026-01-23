@@ -1,6 +1,7 @@
 'use client';
 import Image from 'next/image';
 import { useLanguage } from '@/context/LanguageContext';
+import ServiceCard from '@/components/cards/ServiceCard';
 
 export default function ServicesSection() {
   const { t } = useLanguage();
@@ -8,8 +9,8 @@ export default function ServicesSection() {
 
   const services = [
     { title: t('services.items.app'), description: t('services.descriptions.app'), image: "/services/AppMob.png", alt: "Mockup aplikasi mobile" },
-    { title: t('services.items.hak_merk'), description: t('services.descriptions.hak_merk'), image: "/services/HakMerk.png", alt: "Mockup hak merk" },
-    { title: t('services.items.website'), description: t('services.descriptions.website'), image: "/services/Web.png", alt: "Mockup website profesional" },
+    { title: t('services.items.hak_merk'), description: t('services.descriptions.hak_merk'), image: "/services/Trademark.png", alt: "Mockup hak merk" },
+    { title: t('services.items.website'), description: t('services.descriptions.website'), image: "/services/web.png", alt: "Mockup website profesional" },
     { title: t('services.items.dashboard'), description: t('services.descriptions.dashboard'), image: "/services/Dashboard.png", alt: "Mockup dashboard analitik" },
     { title: t('services.items.ads'), description: t('services.descriptions.ads'), image: "/services/Ads.png", alt: "Iklan Google di halaman pencarian" },
     { title: t('services.items.seo'), description: t('services.descriptions.seo'), image: "/services/SEO.png", alt: "Contoh hasil artikel SEO" },
@@ -21,13 +22,16 @@ export default function ServicesSection() {
         <h2 className="text-3xl md:text-4xl font-bold mb-4">{t('services.title')}</h2>
         <p className="text-lg text-gray-600 mb-12 max-w-2xl mx-auto dark:text-gray-400">{t('services.subtitle')}</p>
 
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 '>
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
           {services.map((service, index) => (
-            <div key={index} className="p-0 md:p-3 h-80 w-auto lg:h-[450px] rounded-xl shadow-md md:shadow-none lg:shadow-md text-left transition-transform hover:-translate-y-2">
-              <div className="relative w-full h-full mb-4 rounded-lg overflow-hidden">
-                <Image src={service.image} alt={service.alt} fill className='object-cover md:object-contain lg:object-cover dark:bg-white' />
-              </div>
-            </div>
+            <ServiceCard
+              key={index}
+              title={service.title}
+              description={service.description}
+              image={service.image}
+              alt={service.alt}
+              className="h-full min-h-[400px]"
+            />
           ))}
         </div>
       </div>
