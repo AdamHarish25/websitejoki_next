@@ -17,12 +17,12 @@ import PricingSection from "@/components/sections/PricingSections";
 // karena itu tugasnya layout
 export default function HomePage() {
 
-  
-  
+
+
   return (
     <main className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       <Navbar />
-      <HeroSection  />
+      <HeroSection />
       <AnimatedSection>
         <StatsSection />
       </AnimatedSection>
@@ -36,15 +36,10 @@ export default function HomePage() {
       </AnimatedSection>
       <AnimatedSection>
         <FaqSection />
-      </AnimatedSection>
-      {/* <AnimatedSection>
-        <PricingSection category="seo" />
-      </AnimatedSection> */}
-      <AnimatedSection>
         <CtaSection />
       </AnimatedSection>
-      <FloatingWhatsApp/>
-      <Footer/>
+      <FloatingWhatsApp />
+      <Footer />
     </main>
   );
 }

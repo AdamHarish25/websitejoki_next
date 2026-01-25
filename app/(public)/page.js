@@ -19,8 +19,10 @@ export default function HomePage() {
       <AnimatedSection><CollaborationSection /></AnimatedSection>
       {/* <AnimatedSection><ExperienceSection /></AnimatedSection> */}
       <AnimatedSection><PortfolioSection /></AnimatedSection>
-      <AnimatedSection><FaqSection /></AnimatedSection>
-      <AnimatedSection><CtaSection /></AnimatedSection>
+      <AnimatedSection>
+        <FaqSection />
+        <CtaSection />
+      </AnimatedSection>
       <FloatingWhatsApp />
     </main>
   );

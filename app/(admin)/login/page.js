@@ -38,7 +38,7 @@ export default function LoginPage() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 relative">
       <Link href={'/'} className='absolute top-3 left-3 text-underline flex items-center gap-5 transition-transform hover:scale-96 hover:underline'>
-        <FaArrowCircleLeft/> Kembali ke beranda
+        <FaArrowCircleLeft /> Kembali ke beranda
       </Link>
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-xl shadow-lg">
         <h1 className="text-3xl font-bold text-center text-gray-800">
@@ -47,7 +47,7 @@ export default function LoginPage() {
         <p className="text-center text-gray-500">
           Silakan masuk untuk mengelola konten website.
         </p>
-        
+
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
             <label
@@ -63,7 +63,7 @@ export default function LoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md dark:text-black shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
               placeholder="anda@email.com"
             />
           </div>
@@ -81,7 +81,7 @@ export default function LoginPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm dark:text-black focus:ring-indigo-500 focus:border-indigo-500"
               placeholder="••••••••"
             />
           </div>
