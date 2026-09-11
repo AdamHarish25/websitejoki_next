@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { doc, getDoc } from 'firebase/firestore';
@@ -26,7 +26,7 @@ import {
  * - Tombol Kembali ke Beranda
  * - Tombol Chat WhatsApp
  */
-export default function OrderSuccessPage() {
+function OrderSuccessContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get('orderId');
   const { language } = useLanguage();
@@ -219,5 +219,17 @@ export default function OrderSuccessPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function OrderSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-[60vh] items-center justify-center p-8">
+        <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-green-200 border-t-green-600" />
+      </div>
+    }>
+      <OrderSuccessContent />
+    </Suspense>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import {
@@ -36,7 +36,8 @@ import {
  * - User pilih salah satu paket -> tombol selanjutnya aktif
  * - Klik Selanjutnya -> context.setPackage + nextStep() -> pindah ke step 2
  */
-export default function Step1ServicePage() {
+
+function Step1ServiceContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const preselectCategory = searchParams.get('category') || null;
@@ -412,5 +413,17 @@ export default function Step1ServicePage() {
         </button>
       </div>
     </div>
+  );
+}
+
+export default function Step1ServicePage() {
+  return (
+    <Suspense fallback={
+      <div className="flex justify-center items-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-green-500" />
+      </div>
+    }>
+      <Step1ServiceContent />
+    </Suspense>
   );
 }
