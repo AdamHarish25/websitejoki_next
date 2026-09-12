@@ -51,7 +51,7 @@ export default function Step3CustomerPage() {
         return;
       }
     }
-  }, [state, router]);
+  }, [state.serviceCategory, state.packageId, state.templateId, state.scopeData?.projectBrief, router]);
 
   const handleNext = async () => {
     const stepErrors = getValidationErrors(3);

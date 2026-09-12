@@ -36,8 +36,13 @@ export default function TemplateGallery() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
+  const [imgErrors, setImgErrors] = useState({});
 
   const selectedTemplateId = state.templateId;
+
+  const handleImgError = (templateId) => {
+    setImgErrors(prev => ({ ...prev, [templateId]: true }));
+  };
 
   // Fetch templates dari Firestore
   useEffect(() => {
@@ -172,13 +177,14 @@ export default function TemplateGallery() {
               >
                 {/* Thumbnail / Placeholder */}
                 <div className="relative aspect-[16/10] w-full overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50 dark:from-gray-700 dark:to-gray-800">
-                  {template.thumbnailUrl ? (
+                  {template.thumbnailUrl && !imgErrors[template.id] ? (
                     <Image
                       src={template.thumbnailUrl}
                       alt={name}
                       fill
                       className="object-cover transition-transform duration-300 group-hover:scale-105"
                       sizes="(max-width: 640px) 100vw, 50vw"
+                      onError={() => handleImgError(template.id)}
                     />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center">

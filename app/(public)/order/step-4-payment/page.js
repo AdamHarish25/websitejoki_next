@@ -62,7 +62,7 @@ export default function Step4PaymentPage() {
       router.replace('/order/step-3-customer');
       return;
     }
-  }, [state, router]);
+  }, [state.serviceCategory, state.packageId, state.customerData?.fullName, state.customerData?.email, state.customerData?.phone, router]);
 
   const handleSubmit = async () => {
     const stepErrors = getValidationErrors(4);
@@ -133,7 +133,7 @@ export default function Step4PaymentPage() {
       }
 
       // Redirect to success page
-      router.push(`/order/success?orderId=${orderId}`);
+      router.push(`/order/step-4-payment/success?orderId=${orderId}`);
     } catch (err) {
       console.error('Submit order error:', err);
       setSubmitError(

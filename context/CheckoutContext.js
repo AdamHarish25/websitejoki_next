@@ -118,12 +118,21 @@ function saveStateToStorage(state) {
 // PROVIDER COMPONENT
 // ============================================================
 export function CheckoutProvider({ children }) {
-  const [state, setState] = useState(() => loadPersistedState());
+  const [hydrated, setHydrated] = useState(false);
+  const [state, setState] = useState(() => getInitialState());
+
+  // --- LOAD DARI LOCALSTORAGE SETELAH HYDRATE (avoid hydration mismatch) ---
+  useEffect(() => {
+    setState(loadPersistedState());
+    setHydrated(true);
+  }, []);
 
   // --- PERSIST KE LOCALSTORAGE SETIAP STATE BERUBAH ---
   useEffect(() => {
-    saveStateToStorage(state);
-  }, [state]);
+    if (hydrated) {
+      saveStateToStorage(state);
+    }
+  }, [state, hydrated]);
 
   // --- SET CATEGORY LANGKAH 1 ---
   const setServiceCategory = useCallback((category) => {

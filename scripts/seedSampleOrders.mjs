@@ -167,7 +167,7 @@ const SAMPLE_ORDERS = [
       id: "tpl_global",
       name: "Global Company - Company Profile",
       category: "company-profile",
-      thumbnailUrl: "/templates/global-company.jpg",
+      thumbnailUrl: "https://res.cloudinary.com/dxpuz7mha/image/upload/templates/global-company.jpg",
       previewUrl: "https://demo.websitejoki.my.id/global-company",
       tier: "basic"
     },

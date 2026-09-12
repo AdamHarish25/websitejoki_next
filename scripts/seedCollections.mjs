@@ -188,7 +188,7 @@ const TEMPLATES = [
     name: "Startup Agency - Landing Page Jasa",
     nameEn: "Startup Agency - Service Landing Page",
     category: "landing-page",
-    thumbnailUrl: "/templates/startup-agency.jpg",
+    thumbnailUrl: "https://res.cloudinary.com/dxpuz7mha/image/upload/templates/startup-agency.jpg",
     previewUrl: "https://demo.websitejoki.my.id/startup-agency",
     features: [
       "Hero dengan CTA utama & testimoni",
@@ -212,7 +212,7 @@ const TEMPLATES = [
     name: "Global Company - Company Profile",
     nameEn: "Global Company Profile",
     category: "company-profile",
-    thumbnailUrl: "/templates/global-company.jpg",
+    thumbnailUrl: "https://res.cloudinary.com/dxpuz7mha/image/upload/templates/global-company.jpg",
     previewUrl: "https://demo.websitejoki.my.id/global-company",
     features: [
       "Tentang perusahaan + visi misi",
@@ -236,7 +236,7 @@ const TEMPLATES = [
     name: "UMKM Resto & Cafe",
     nameEn: "Restaurant & Cafe UMKM",
     category: "web",
-    thumbnailUrl: "/templates/resto-cafe.jpg",
+    thumbnailUrl: "https://res.cloudinary.com/dxpuz7mha/image/upload/templates/resto-cafe.jpg",
     previewUrl: "https://demo.websitejoki.my.id/resto-cafe",
     features: [
       "Menu makanan & minuman (bisa update sendiri)",
@@ -260,7 +260,7 @@ const TEMPLATES = [
     name: "Klinik & Praktik Dokter",
     nameEn: "Clinic & Doctor Practice",
     category: "web",
-    thumbnailUrl: "/templates/klinik.jpg",
+    thumbnailUrl: "https://res.cloudinary.com/dxpuz7mha/image/upload/templates/klinik.jpg",
     previewUrl: "https://demo.websitejoki.my.id/klinik",
     features: [
       "Profil dokter & jadwal praktik",
@@ -284,7 +284,7 @@ const TEMPLATES = [
     name: "Toko Online WooCommerce",
     nameEn: "WooCommerce Online Store",
     category: "ecommerce",
-    thumbnailUrl: "/templates/toko-online.jpg",
+    thumbnailUrl: "https://res.cloudinary.com/dxpuz7mha/image/upload/templates/toko-online.jpg",
     previewUrl: "https://demo.websitejoki.my.id/toko-online",
     features: [
       "Unlimited produk + kategori",
@@ -308,7 +308,7 @@ const TEMPLATES = [
     name: "Sekolah & Akademi",
     nameEn: "School & Academy",
     category: "web",
-    thumbnailUrl: "/templates/sekolah.jpg",
+    thumbnailUrl: "https://res.cloudinary.com/dxpuz7mha/image/upload/templates/sekolah.jpg",
     previewUrl: "https://demo.websitejoki.my.id/sekolah",
     features: [
       "Profil sekolah & fasilitas",
@@ -332,7 +332,7 @@ const TEMPLATES = [
     name: "Portfolio Freelancer & Creator",
     nameEn: "Freelancer & Creator Portfolio",
     category: "landing-page",
-    thumbnailUrl: "/templates/portfolio-creator.jpg",
+    thumbnailUrl: "https://res.cloudinary.com/dxpuz7mha/image/upload/templates/portfolio-creator.jpg",
     previewUrl: "https://demo.websitejoki.my.id/portfolio-creator",
     features: [
       "About / bio personal brand",
@@ -356,7 +356,7 @@ const TEMPLATES = [
     name: "Premium Custom Agency (From Scratch)",
     nameEn: "Premium Custom Agency (From Scratch)",
     category: "web",
-    thumbnailUrl: "/templates/premium-custom.jpg",
+    thumbnailUrl: "https://res.cloudinary.com/dxpuz7mha/image/upload/templates/premium-custom.jpg",
     previewUrl: "https://demo.websitejoki.my.id/custom-premium",
     features: [
       "Desain custom Figma dari nol (bukan template)",
