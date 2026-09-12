@@ -1,5 +1,4 @@
 'use client';
-import { icons } from "lucide-react";
 import Image from "next/image";
 import { useLanguage } from '@/context/LanguageContext';
 
